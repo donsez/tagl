@@ -1,0 +1,11 @@
+
+RELEASE 2.0 -  
+
+The cron4j 2.0 platform includes several new amazing features:
+- New task abstraction layer
+- Task collectors
+- Task executors
+- Scheduling from files
+- Cron parser
+- Support for different Time Zones
+- A new event driven API
