@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="rel">
 
-	<property file="${basedir}/build.properties" />
+    <condition property="revision" value="${svn.info.rev}" else="UNKNOWN">
+        <isset property="svn.info.rev" />
+    </condition>
+    <condition property="version" value="${version}" else="${revision}">
+        <isset property="version" />
+    </condition>
+    <condition property="target.zip.dir" value="${target.dir}" else="${basedir}">
+        <isset property="target.dir" />
+    </condition>
+    <property file="${basedir}/build.properties" />    
 
 	<target name="bin">
 		<delete dir="${cron4j.dirs.bin}" />
@@ -16,7 +25,7 @@
 	<target name="doc">
 		<delete dir="${cron4j.dirs.api}" />
 		<mkdir dir="${cron4j.dirs.api}" />
-		<javadoc sourcepath="${cron4j.dirs.src}" destdir="${cron4j.dirs.api}" doctitle="cron4j ${cron4j.version}" linksource="yes" source="1.2" access="protected" author="true" version="true" verbose="true">
+		<javadoc sourcepath="${cron4j.dirs.src}" destdir="${cron4j.dirs.api}" doctitle="cron4j ${version}" linksource="yes" source="1.2" access="protected" author="true" version="true" verbose="true">
 			<package name="it.sauronsoftware.cron4j.*" />
 		</javadoc>
 	</target>
@@ -24,7 +33,7 @@
 	<target name="rel" depends="bin,jar,doc">
 		<delete dir="${cron4j.dirs.tmp}" />
 		<mkdir dir="${cron4j.dirs.tmp}" />
-		<property name="cron4j.dirs.rel" value="${cron4j.dirs.tmp}/cron4j-${cron4j.version}" />
+		<property name="cron4j.dirs.rel" value="${cron4j.dirs.tmp}/cron4j-${version}" />
 		<mkdir dir="${cron4j.dirs.rel}" />
 		<copy todir="${cron4j.dirs.rel}" verbose="true">
 			<fileset dir="${basedir}" includes="examples/**" />
@@ -44,7 +53,7 @@
 		<copy todir="${cron4j.dirs.rel}/doc" verbose="true">
 			<fileset dir="${cron4j.dirs.doc}" />
 		</copy>
-		<zip destfile="${cron4j.files.rel}" basedir="${cron4j.dirs.tmp}" includes="cron4j-${cron4j.version}/**" />
+		<zip destfile="${cron4j.files.rel}" basedir="${cron4j.dirs.tmp}" includes="cron4j-${version}/**" />
 		<delete dir="${cron4j.dirs.tmp}" />
 	</target>
 
