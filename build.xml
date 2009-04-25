@@ -5,7 +5,7 @@
         <isset property="svn.info.rev" />
     </condition>
     <condition property="version" value="${version}" else="rv${revision}">
-        <isset property="version" />
+        <isset property="svn.tag" />
     </condition>
     <condition property="target.zip.dir" value="${target.dir}" else="${basedir}">
         <isset property="target.dir" />
