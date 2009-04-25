@@ -1,5 +1,5 @@
 
-RELEASE 2.0 -  
+RELEASE 2.0 - 2009-04-25 
 
 The cron4j 2.0 platform includes several new amazing features:
 - New task abstraction layer
