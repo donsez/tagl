@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="rel">
+<project name="cron4j" default="rel">
 
     <condition property="revision" value="${svn.info.rev}" else="UNKNOWN">
         <isset property="svn.info.rev" />
@@ -16,6 +16,12 @@
 		<delete dir="${cron4j.dirs.bin}" />
 		<mkdir dir="${cron4j.dirs.bin}" />
 		<javac srcdir="${cron4j.dirs.src}" destdir="${cron4j.dirs.bin}" source="1.2" target="1.2" />
+        <copy todir="${cron4j.dirs.bin}">
+            <fileset dir="${cron4j.dirs.src}">
+                <exclude name="**/*.java" />
+                <exclude name="**/package.html" />
+            </fileset>
+        </copy>
 	</target>
 
 	<target name="jar" depends="bin">
