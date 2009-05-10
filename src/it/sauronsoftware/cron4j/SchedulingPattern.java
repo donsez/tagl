@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -136,18 +137,31 @@ import java.util.TimeZone;
  * @since 2.0
  */
 public class SchedulingPattern {
+	
+	/**
+	 * The parser for the minute values.
+	 */
+	private static final ValueParser MINUTE_VALUE_PARSER = new MinuteValueParser();
 
 	/**
-	 * Months aliases.
+	 * The parser for the hour values.
 	 */
-	private static String[] MONTHS = { "", "jan", "feb", "mar", "apr", "may",
-			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+	private static final ValueParser HOUR_VALUE_PARSER = new HourValueParser();
 
 	/**
-	 * Days of week aliases.
+	 * The parser for the day of month values.
 	 */
-	private static String[] DAYS_OF_WEEK = { "sun", "mon", "tue", "wed", "thu",
-			"fri", "sat" };
+	private static final ValueParser DAY_OF_MONTH_VALUE_PARSER = new DayOfMonthValueParser();
+
+	/**
+	 * The parser for the month values.
+	 */
+	private static final ValueParser MONTH_VALUE_PARSER = new MonthValueParser();
+
+	/**
+	 * The parser for the day of week values.
+	 */
+	private static final ValueParser DAY_OF_WEEK_VALUE_PARSER = new DayOfWeekValueParser();
 
 	/**
 	 * Validates a string as a scheduling pattern.
@@ -213,19 +227,39 @@ public class SchedulingPattern {
 		this.asString = pattern;
 		StringTokenizer st1 = new StringTokenizer(pattern, "|");
 		if (st1.countTokens() < 1) {
-			throw new InvalidPatternException();
+			throw new InvalidPatternException("invalid pattern: \"" + pattern + "\"");
 		}
 		while (st1.hasMoreTokens()) {
 			String localPattern = st1.nextToken();
 			StringTokenizer st2 = new StringTokenizer(localPattern, " \t");
 			if (st2.countTokens() != 5) {
-				throw new InvalidPatternException();
+				throw new InvalidPatternException("invalid pattern: \"" + localPattern + "\"");
 			}
-			minuteMatchers.add(buildValueMatcher(st2.nextToken(), 0, 59, null));
-			hourMatchers.add(buildValueMatcher(st2.nextToken(), 0, 23, null));
-			dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(), 1, 31, null));
-			monthMatchers.add(buildValueMatcher(st2.nextToken(), 1, 12, MONTHS));
-			dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(), 0, 6, DAYS_OF_WEEK));
+			try {
+				minuteMatchers.add(buildValueMatcher(st2.nextToken(), MINUTE_VALUE_PARSER));
+			} catch (Exception e) {
+				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing minutes field: " + e.getMessage() + ".");
+			}
+			try {
+				hourMatchers.add(buildValueMatcher(st2.nextToken(), HOUR_VALUE_PARSER));
+			} catch (Exception e) {
+				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing hours field: " + e.getMessage() + ".");
+			}
+			try {
+				dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_MONTH_VALUE_PARSER));
+			} catch (Exception e) {
+				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing days of month field: " + e.getMessage() + ".");
+			}
+			try {
+				monthMatchers.add(buildValueMatcher(st2.nextToken(), MONTH_VALUE_PARSER));
+			} catch (Exception e) {
+				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing months field: " + e.getMessage() + ".");
+			}
+			try {
+				dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_WEEK_VALUE_PARSER));
+			} catch (Exception e) {
+				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing days of week field: " + e.getMessage() + ".");
+			}
 			matcherSize++;
 		}
 	}
@@ -235,150 +269,138 @@ public class SchedulingPattern {
 	 * 
 	 * @param str
 	 *            The pattern part for the ValueMatcher creation.
-	 * @param minValue
-	 *            The minimum value for the field represented by the
-	 *            ValueMatcher.
-	 * @param maxValue
-	 *            The maximum value for the field represented by the
-	 *            ValueMatcher.
-	 * @param stringEquivalents
-	 *            An array of aliases for the numeric values. It can be null if
-	 *            no alias is provided.
+	 * @param parser
+	 *            The parser used to parse the values.
 	 * @return The requested ValueMatcher.
-	 * @throws InvalidPatternException
-	 *             If the pattern part supplied is not valid.
+	 * @throws Exception
+	 *             If the supplied pattern part is not valid.
 	 */
-	private ValueMatcher buildValueMatcher(String str, int minValue,
-			int maxValue, String[] stringEquivalents)
-			throws InvalidPatternException {
+	private ValueMatcher buildValueMatcher(String str, ValueParser parser) throws Exception {
 		if (str.length() == 1 && str.equals("*")) {
 			return new AlwaysTrueValueMatcher();
 		}
-		StringTokenizer st = new StringTokenizer(str, "/");
-		int tokens = st.countTokens();
-		if (tokens < 1 || tokens > 2) {
-			throw new InvalidPatternException();
-		}
-		ArrayList list = buildPart1(st.nextToken(), minValue, maxValue,
-				stringEquivalents);
-		if (tokens == 2) {
-			list = buildPart2(list, st.nextToken(), minValue, maxValue);
-		}
-		return new IntArrayValueMatcher(list);
-	}
-
-	private ArrayList buildPart1(String str, int minValue, int maxValue,
-			String[] stringEquivalents) throws InvalidPatternException {
-		if (str.length() == 1 && str.equals("*")) {
-			ArrayList ret = new ArrayList();
-			for (int i = minValue; i <= maxValue; i++) {
-				ret.add(new Integer(i));
-			}
-			return ret;
-		}
+		ArrayList values = new ArrayList();
 		StringTokenizer st = new StringTokenizer(str, ",");
-		if (st.countTokens() < 1) {
-			throw new InvalidPatternException();
-		}
-		ArrayList list = new ArrayList();
 		while (st.hasMoreTokens()) {
-			ArrayList list2 = buildPart1_1(st.nextToken(), minValue, maxValue,
-					stringEquivalents);
-			int size = list2.size();
-			for (int i = 0; i < size; i++) {
-				list.add(list2.get(i));
-			}
-		}
-		return list;
-	}
-
-	private ArrayList buildPart1_1(String str, int minValue, int maxValue,
-			String[] stringEquivalents) throws InvalidPatternException {
-		StringTokenizer st = new StringTokenizer(str, "-");
-		int tokens = st.countTokens();
-		if (tokens < 1 || tokens > 2) {
-			throw new InvalidPatternException();
-		}
-		String str1 = st.nextToken();
-		int value1;
-		try {
-			value1 = Integer.parseInt(str1);
-		} catch (NumberFormatException e) {
-			if (stringEquivalents != null) {
-				try {
-					value1 = getIntValue(str1, stringEquivalents);
-				} catch (Exception e1) {
-					throw new InvalidPatternException();
-				}
-			} else {
-				throw new InvalidPatternException();
-			}
-		}
-		if (value1 < minValue || value1 > maxValue) {
-			throw new InvalidPatternException();
-		}
-		int value2 = value1;
-		if (tokens == 2) {
-			String str2 = st.nextToken();
+			String element = st.nextToken();
+			ArrayList local;
 			try {
-				value2 = Integer.parseInt(str2);
-			} catch (NumberFormatException e) {
-				if (stringEquivalents != null) {
-					try {
-						value2 = getIntValue(str2, stringEquivalents);
-					} catch (Exception e1) {
-						throw new InvalidPatternException();
-					}
-				} else {
-					throw new InvalidPatternException();
+				local = parseListElement(element, parser);
+			} catch (Exception e) {
+				throw new Exception("invalid field \"" + str + "\", invalid element \"" + element + "\", " + e.getMessage());
+			}
+			for (Iterator i = local.iterator(); i.hasNext();) {
+				Object value = i.next();
+				if (!values.contains(value)) {
+					values.add(value);
 				}
 			}
-			if (value2 < minValue || value2 > maxValue || value2 <= value1) {
-				throw new InvalidPatternException();
-			}
 		}
-		ArrayList list = new ArrayList();
-		for (int i = value1; i <= value2; i++) {
-			Integer aux = new Integer(i);
-			if (!list.contains(aux)) {
-				list.add(aux);
-			}
+		if (values.size() == 0) {
+			throw new Exception("invalid field \"" + str + "\"");
 		}
-		return list;
-	}
-
-	private ArrayList buildPart2(ArrayList list, String p2, int minValue,
-			int maxValue) throws InvalidPatternException {
-		int div = 0;
-		try {
-			div = Integer.parseInt(p2);
-		} catch (NumberFormatException e) {
-			;
-		}
-		if (div <= minValue || div >= maxValue) {
-			throw new InvalidPatternException();
-		}
-		int size = list.size();
-		ArrayList list2 = new ArrayList();
-		for (int i = 0; i < size; i++) {
-			Integer aux = (Integer) list.get(i);
-			if (aux.intValue() % div == 0) {
-				list2.add(aux);
-			}
-		}
-		return list2;
+		return new IntArrayValueMatcher(values);
 	}
 
 	/**
-	 * This utility method changes an alias to an int value.
+	 * Parses an element of a list of values of the pattern.
+	 * 
+	 * @param str
+	 *            The element string.
+	 * @param parser
+	 *            The parser used to parse the values.
+	 * @return A list of integers representing the allowed values.
+	 * @throws Exception
+	 *             If the supplied pattern part is not valid.
 	 */
-	private int getIntValue(String value, String[] values) throws Exception {
-		for (int i = 0; i < values.length; i++) {
-			if (values[i].equalsIgnoreCase(value)) {
-				return i;
-			}
+	private ArrayList parseListElement(String str, ValueParser parser) throws Exception {
+		StringTokenizer st = new StringTokenizer(str, "/");
+		int size = st.countTokens();
+		if (size < 1 || size > 2) {
+			throw new Exception("syntax error");
 		}
-		throw new Exception();
+		ArrayList values;
+		try {
+			values = parseRange(st.nextToken(), parser);
+		} catch (Exception e) {
+			throw new Exception("invalid range, " + e.getMessage());
+		}
+		if (size == 2) {
+			String dStr = st.nextToken();
+			int div;
+			try {
+				div = Integer.parseInt(dStr);
+			} catch (NumberFormatException e) {
+				throw new Exception("invalid divisor \"" + dStr + "\"");
+			}
+			if (div < 1) {
+				throw new Exception("non positive divisor \"" + div + "\"");
+			}
+			ArrayList values2 = new ArrayList();
+			for (Iterator i = values.iterator(); i.hasNext();) {
+				Integer value = (Integer) i.next();
+				if (value.intValue() % div == 0) {
+					values2.add(value);
+				}
+			}
+			return values2;
+		} else {
+			return values;
+		}
+	}
+
+	/**
+	 * Parses a range of values.
+	 * 
+	 * @param str
+	 *            The range string.
+	 * @param parser
+	 *            The parser used to parse the values.
+	 * @return A list of integers representing the allowed values.
+	 * @throws Exception
+	 *             If the supplied pattern part is not valid.
+	 */
+	private ArrayList parseRange(String str, ValueParser parser) throws Exception {
+		if (str.equals("*")) {
+			int[] all = parser.getAllPossibleValues();
+			ArrayList values = new ArrayList();
+			for (int i = 0; i < all.length; i++) {
+				values.add(new Integer(all[i]));
+			}
+			return values;
+		}
+		StringTokenizer st = new StringTokenizer(str, "-");
+		int size = st.countTokens();
+		if (size < 1 || size > 2) {
+			throw new Exception("syntax error");
+		}
+		String v1Str = st.nextToken();
+		int v1;
+		try {
+			v1 = parser.parse(v1Str);
+		} catch (Exception e) {
+			throw new Exception("invalid value \"" + v1Str + "\", " + e.getMessage());
+		}
+		if (size == 1) {
+			ArrayList values = new ArrayList();
+			values.add(new Integer(v1));
+			return values;
+		} else {
+			String v2Str = st.nextToken();
+			int v2;
+			try {
+				v2 = parser.parse(v2Str);
+			} catch (Exception e) {
+				throw new Exception("invalid value \"" + v2Str + "\", " + e.getMessage());
+			}
+			int s1 = Math.min(v1, v2);
+			int s2 = Math.max(v1, v2);
+			ArrayList values = new ArrayList();
+			for (int i = s1; i <= s2; i++) {
+				values.add(new Integer(i));
+			}
+			return values;
+		}
 	}
 
 	/**
@@ -429,7 +451,7 @@ public class SchedulingPattern {
 	public boolean match(long millis) {
 		return match(TimeZone.getDefault(), millis);
 	}
-	
+
 	/**
 	 * Returns the pattern as a string.
 	 * 
@@ -437,6 +459,206 @@ public class SchedulingPattern {
 	 */
 	public String toString() {
 		return asString;
+	}
+
+	/**
+	 * This utility method changes an alias to an int value.
+	 * 
+	 * @param value
+	 *            The value.
+	 * @param aliases
+	 *            The aliases list.
+	 * @param offset
+	 *            The offset appplied to the aliases list indices.
+	 * @return The parsed value.
+	 * @throws Exception
+	 *             If the expressed values doesn't match any alias.
+	 */
+	private static int parseAlias(String value, String[] aliases, int offset)
+			throws Exception {
+		for (int i = 0; i < aliases.length; i++) {
+			if (aliases[i].equalsIgnoreCase(value)) {
+				return offset + i;
+			}
+		}
+		throw new Exception("invalid alias \"" + value + "\"");
+	}
+
+	/**
+	 * Definition for a value parser.
+	 */
+	private static interface ValueParser {
+
+		/**
+		 * Attempts to parse a value.
+		 * 
+		 * @param value
+		 *            The value.
+		 * @return The parsed value.
+		 * @throws Exception
+		 *             If the value can't be parsed.
+		 */
+		public int parse(String value) throws Exception;
+		
+		/**
+		 * Returns a list of all the values allowed.
+		 * 
+		 * @return A list of all the values allowed.
+		 */
+		public int[] getAllPossibleValues();
+
+	}
+
+	/**
+	 * A simple value parser.
+	 */
+	private static class SimpleValueParser implements ValueParser {
+
+		/**
+		 * The minimum allowed value.
+		 */
+		protected int minValue;
+
+		/**
+		 * The maximum allowed value.
+		 */
+		protected int maxValue;
+
+		/**
+		 * Builds the value parser.
+		 * 
+		 * @param minValue
+		 *            The minimum allowed value.
+		 * @param maxValue
+		 *            The maximum allowed value.
+		 */
+		public SimpleValueParser(int minValue, int maxValue) {
+			this.minValue = minValue;
+			this.maxValue = maxValue;
+		}
+
+		public int parse(String value) throws Exception {
+			int i;
+			try {
+				i = Integer.parseInt(value);
+			} catch (NumberFormatException e) {
+				throw new Exception("invalid integer value");
+			}
+			if (i < minValue || i > maxValue) {
+				throw new Exception("value out of range");
+			}
+			return i;
+		}
+
+		public int[] getAllPossibleValues() {
+			int size = maxValue - minValue + 1;
+			int[] ret = new int[size];
+			for (int i = 0; i < size; i++) {
+				ret[i] = minValue + i;
+			}
+			return ret;
+		}
+
+	}
+	
+	/**
+	 * The minutes value parser.
+	 */
+	private static class MinuteValueParser extends SimpleValueParser {
+
+		/**
+		 * Builds the value parser.
+		 */
+		public MinuteValueParser() {
+			super(0, 59);
+		}
+		
+	}
+
+	/**
+	 * The hours value parser.
+	 */
+	private static class HourValueParser extends SimpleValueParser {
+
+		/**
+		 * Builds the value parser.
+		 */
+		public HourValueParser() {
+			super(0, 59);
+		}
+		
+	}
+
+	/**
+	 * The days of month value parser.
+	 */
+	private static class DayOfMonthValueParser extends SimpleValueParser {
+
+		/**
+		 * Builds the value parser.
+		 */
+		public DayOfMonthValueParser() {
+			super(1, 31);
+		}
+		
+	}
+
+	/**
+	 * The value parser for the months field.
+	 */
+	private static class MonthValueParser extends SimpleValueParser {
+
+		/**
+		 * Months aliases.
+		 */
+		private static String[] ALIASES = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+
+		/**
+		 * Builds the months value parser.
+		 */
+		public MonthValueParser() {
+			super(1, 12);
+		}
+
+		public int parse(String value) throws Exception {
+			try {
+				// try as a simple value
+				return super.parse(value);
+			} catch (Exception e) {
+				// try as an alias
+				return parseAlias(value, ALIASES, 1);
+			}
+		}
+		
+	}
+
+	/**
+	 * The value parser for the months field.
+	 */
+	private static class DayOfWeekValueParser extends SimpleValueParser {
+
+		/**
+		 * Days of week aliases.
+		 */
+		private static String[] ALIASES = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+
+		/**
+		 * Builds the months value parser.
+		 */
+		public DayOfWeekValueParser() {
+			super(0, 7);
+		}
+
+		public int parse(String value) throws Exception {
+			try {
+				// try as a simple value
+				return super.parse(value) % 7;
+			} catch (Exception e) {
+				// try as an alias
+				return parseAlias(value, ALIASES, 0);
+			}
+		}
+
 	}
 
 }

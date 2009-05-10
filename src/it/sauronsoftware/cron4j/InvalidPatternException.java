@@ -36,4 +36,11 @@ public class InvalidPatternException extends RuntimeException {
 	InvalidPatternException() {
 	}
 
+	/**
+	 * Package-reserved construction.
+	 */
+	InvalidPatternException(String message) {
+		super(message);
+	}
+
 }
