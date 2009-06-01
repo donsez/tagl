@@ -31,7 +31,7 @@
 	<target name="doc">
 		<delete dir="${cron4j.dirs.api}" />
 		<mkdir dir="${cron4j.dirs.api}" />
-		<javadoc sourcepath="${cron4j.dirs.src}" destdir="${cron4j.dirs.api}" doctitle="cron4j ${version}" linksource="yes" source="1.2" access="protected" author="true" version="true" verbose="true">
+		<javadoc sourcepath="${cron4j.dirs.src}" destdir="${cron4j.dirs.api}" doctitle="cron4j ${version}" linksource="yes" access="protected" author="true" version="true" verbose="true">
 			<package name="it.sauronsoftware.cron4j.*" />
 		</javadoc>
 	</target>
