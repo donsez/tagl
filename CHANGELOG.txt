@@ -1,3 +1,10 @@
+RELEASE 2.0.1 - 2009-06-01
+
+- The SchedulingPattern parser has been rewritten to be 100% compliant
+  with the UNIX crontab specification.
+
+(Thanks to Paul Logan)
+
 
 RELEASE 2.0 - 2009-04-25 
 
