@@ -35,7 +35,7 @@ import java.io.OutputStream;
  * @author Carlo Pelliccia
  * @since 2.0
  */
-class ProcessTask extends Task {
+public class ProcessTask extends Task {
 
 	/**
 	 * The command to launch.
@@ -93,7 +93,93 @@ class ProcessTask extends Task {
 	}
 
 	/**
-	 * Sets the standard input file (optional). If supplied the standard input
+	 * Returns true.
+	 */
+	public boolean canBeStopped() {
+		return true;
+	}
+
+	/**
+	 * Returns the command executed by this task.
+	 * 
+	 * @return The command executed by this task.
+	 */
+	public String[] getCommand() {
+		return command;
+	}
+
+	/**
+	 * Sets the command executed by this task.
+	 * 
+	 * @param command
+	 *            The command executed by this task.
+	 */
+	public void setCommand(String[] command) {
+		this.command = command;
+	}
+
+	/**
+	 * Returns the environment variables, in the <em>name=value</em> form, used
+	 * by the task to run its process. If null the process will inherit the
+	 * current JVM environment variables.
+	 * 
+	 * @return The environment variables, in the <em>name=value</em> form, used
+	 *         by the task to run its process. If null the process will inherit
+	 *         the current JVM environment variables.
+	 */
+	public String[] getEnvs() {
+		return envs;
+	}
+
+	/**
+	 * Sets the environment variables, in the <em>name=value</em> form, used by
+	 * the task to run its process. If null the process will inherit the current
+	 * JVM environment variables.
+	 * 
+	 * @param envs
+	 *            The environment variables, in the <em>name=value</em> form,
+	 *            used by the task to run its process. If null the process will
+	 *            inherit the current JVM environment variables.
+	 */
+	public void setEnvs(String[] envs) {
+		this.envs = envs;
+	}
+
+	/**
+	 * Resturns the working directory for the spawned process. If null the
+	 * process will inherit the current JVM working directory.
+	 * 
+	 * @return The working directory for the spawned process. If null the
+	 *         process will inherit the current JVM working directory.
+	 */
+	public File getDirectory() {
+		return directory;
+	}
+
+	/**
+	 * Sets the working directory for the spawned process. If null the process
+	 * will inherit the current JVM working directory.
+	 * 
+	 * @param directory
+	 *            The working directory for the spawned process. If null the
+	 *            process will inherit the current JVM working directory.
+	 */
+	public void setDirectory(File directory) {
+		this.directory = directory;
+	}
+
+	/**
+	 * Returns the standard input file (optional). If supplied, the standard
+	 * input channel of the spawned process will be read from the given file.
+	 * 
+	 * @return The standard input file (optional).
+	 */
+	public File getStdinFile() {
+		return stdinFile;
+	}
+
+	/**
+	 * Sets the standard input file (optional). If supplied, the standard input
 	 * channel of the spawned process will be read from the given file.
 	 * 
 	 * @param stdinFile
@@ -104,8 +190,8 @@ class ProcessTask extends Task {
 	}
 
 	/**
-	 * Sets the standard output file (optional). If supplied the standard output
-	 * channel of the spawned process will be written in the given file.
+	 * Sets the standard output file (optional). If supplied, the standard
+	 * output channel of the spawned process will be written in the given file.
 	 * 
 	 * @param stdoutFile
 	 *            The standard output file (optional).
@@ -115,7 +201,17 @@ class ProcessTask extends Task {
 	}
 
 	/**
-	 * Sets the standard error file (optional). If supplied the standard error
+	 * Returns the standard output file (optional). If supplied, the standard
+	 * output channel of the spawned process will be written in the given file.
+	 * 
+	 * @return The standard output file (optional).
+	 */
+	public File getStdoutFile() {
+		return stdoutFile;
+	}
+
+	/**
+	 * Sets the standard error file (optional). If supplied, the standard error
 	 * channel of the spawned process will be written in the given file.
 	 * 
 	 * @param stderrFile
@@ -125,8 +221,14 @@ class ProcessTask extends Task {
 		this.stderrFile = stderrFile;
 	}
 
-	public boolean canBeStopped() {
-		return true;
+	/**
+	 * Returns the standard error file (optional). If supplied, the standard
+	 * error channel of the spawned process will be written in the given file.
+	 * 
+	 * @return The standard error file (optional).
+	 */
+	public File getStderrFile() {
+		return stderrFile;
 	}
 
 	/**
@@ -167,7 +269,7 @@ class ProcessTask extends Task {
 					+ r);
 		}
 	}
-	
+
 	/**
 	 * Executes the command.
 	 * 
@@ -225,23 +327,6 @@ class ProcessTask extends Task {
 		}
 		return null;
 	}
-	
-	/**
-	 * Overrides {@link Object#toString()}.
-	 */
-	public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("Task[");
-		b.append("cmd=");
-		b.append(ProcessTask.listStrings(command));
-		b.append(", env=");
-		b.append(ProcessTask.listStrings(envs));
-		b.append(", ");
-		b.append("dir=");
-		b.append(directory);
-		b.append("]");
-		return b.toString();
-	}
 
 	/**
 	 * Prints in the returned string the elements contained in the given string
@@ -266,6 +351,23 @@ class ProcessTask extends Task {
 			b.append(']');
 			return b.toString();
 		}
+	}
+
+	/**
+	 * Overrides {@link Object#toString()}.
+	 */
+	public String toString() {
+		StringBuffer b = new StringBuffer();
+		b.append("Task[");
+		b.append("cmd=");
+		b.append(ProcessTask.listStrings(command));
+		b.append(", env=");
+		b.append(ProcessTask.listStrings(envs));
+		b.append(", ");
+		b.append("dir=");
+		b.append(directory);
+		b.append("]");
+		return b.toString();
 	}
 
 }
