@@ -110,6 +110,7 @@ public class TaskTable {
 	public void remove(int index) throws IndexOutOfBoundsException {
 		tasks.remove(index);
 		patterns.remove(index);
+		size--;
 	}
 
 }
