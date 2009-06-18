@@ -98,4 +98,18 @@ public class TaskTable {
 		return (SchedulingPattern) patterns.get(index);
 	}
 
+	/**
+	 * Remove a task from the table.
+	 * 
+	 * @param index
+	 *            The index of the task to remove.
+	 * @throws IndexOutOfBoundsException
+	 *             If the supplied index is not valid.
+	 * @since 2.1
+	 */
+	public void remove(int index) throws IndexOutOfBoundsException {
+		tasks.remove(index);
+		patterns.remove(index);
+	}
+
 }
