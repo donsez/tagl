@@ -74,7 +74,7 @@ public class ProcessTask extends Task {
 	 * Creates the task.
 	 * 
 	 * @param command
-	 *            The command to launch.
+	 *            The command to launch and its arguments.
 	 * @param envs
 	 *            Environment variables for the spawned process, in the form
 	 *            <em>name=value</em>. If null the process will inherit the
@@ -82,14 +82,45 @@ public class ProcessTask extends Task {
 	 * @param directory
 	 *            Working directory for the spawned process. If null the process
 	 *            will inherit the current JVM working directory.
-	 * @throws InvalidPatternException
-	 *             The supplied pattern is not valid.
 	 */
-	public ProcessTask(String[] command, String[] envs, File directory)
-			throws InvalidPatternException {
+	public ProcessTask(String[] command, String[] envs, File directory) {
 		this.command = command;
 		this.envs = envs;
 		this.directory = directory;
+	}
+
+	/**
+	 * Creates the task.
+	 * 
+	 * @param command
+	 *            The command to launch and its arguments.
+	 * @param envs
+	 *            Environment variables for the spawned process, in the form
+	 *            <em>name=value</em>. If null the process will inherit the
+	 *            current JVM environment variables.
+	 */
+	public ProcessTask(String[] command, String[] envs) {
+		this(command, envs, null);
+	}
+
+	/**
+	 * Creates the task.
+	 * 
+	 * @param command
+	 *            The command to launch and its arguments.
+	 */
+	public ProcessTask(String[] command) {
+		this(command, null, null);
+	}
+
+	/**
+	 * Creates the task.
+	 * 
+	 * @param command
+	 *            The command to launch.
+	 */
+	public ProcessTask(String command) {
+		this(new String[] { command }, null, null);
 	}
 
 	/**

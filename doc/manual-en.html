@@ -2,27 +2,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>cron4j 2.0 manual</title>
+<title>cron4j 2.1 manual</title>
 </head>
 <body>
 <a name="pIndex" id="pIndex"></a>
-<h1>cron4j 2.0 manual</h1>
+<h1>cron4j 2.1 manual</h1>
 <h3>Index</h3>
 <ol>
 	<li><a href="#p01">Quickstart</a></li>
 	<li><a href="#p02">Scheduling patterns</a></li>
-	<li><a href="#p03">How to schedule, reschedule and deschedule
-	a task</a></li>
-	<li><a href="#p04">How to schedule processes from a file</a></li>
-	<li><a href="#p05">Building your own task</a></li>
-	<li><a href="#p06">Building your own collector</a></li>
-	<li><a href="#p07">Building your own scheduler listener</a></li>
-	<li><a href="#p08">Executors</a></li>
-	<li><a href="#p09">Manual task launch</a></li>
-	<li><a href="#p10">Working with Time Zones</a></li>
-	<li><a href="#p11">Daemon threads</a></li>
-	<li><a href="#p12">Predictor</a></li>
-	<li><a href="#p13">Cron parser</a></li>
+	<li><a href="#p03">How to schedule, reschedule and deschedule a task</a></li>
+	<li><a href="#p04">How to schedule a system process</a></li>
+	<li><a href="#p05">How to schedule processes from a file</a></li>
+	<li><a href="#p06">Building your own task</a></li>
+	<li><a href="#p07">Building your own collector</a></li>
+	<li><a href="#p08">Building your own scheduler listener</a></li>
+	<li><a href="#p09">Executors</a></li>
+	<li><a href="#p10">Manual task launch</a></li>
+	<li><a href="#p11">Working with Time Zones</a></li>
+	<li><a href="#p12">Daemon threads</a></li>
+	<li><a href="#p13">Predictor</a></li>
+	<li><a href="#p14">Cron parser</a></li>
 </ol>
 
 <a name="p01" id="p01"></a>
@@ -207,7 +207,7 @@ when the supplied string does not represent a valid scheduling pattern.</p>
 <p>Another way to build a task is to extend the <a
 	href="api/it/sauronsoftware/cron4j/Task.html"><em>it.sauronsoftware.cron4j.Task</em></a>
 abstract class, which is more powerful and let the developer access some
-other cron4j features. This is better discussed in the &quot;<a href="#p05">Building
+other cron4j features. This is better discussed in the &quot;<a href="#p06">Building
 your own task</a>&quot; paragraph. <em>Task</em> instances can be scheduled
 with the <a
 	href="api/it/sauronsoftware/cron4j/Scheduler.html#schedule(java.lang.String,%20it.sauronsoftware.cron4j.Task)"><em>schedule(String,
@@ -235,7 +235,12 @@ method.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
 <a name="p04" id="p04"></a>
-<h2>4. How to schedule processes from a file</h2>
+<h2>4. How to schedule a system process</h2>
+<p>System processes can be easily scheduled using the <a href="api/it/sauronsoftware/cron4j/ProcessTask.html">ProcessTask</a> class.</p>
+<p>&nbsp;</p>
+
+<a name="p05" id="p05"></a>
+<h2>5. How to schedule processes from a file</h2>
 <p>The cron4j scheduler can also schedule a set of processes from a
 file.</p>
 <p>You have to prepare a file, very similar to the ones used by the
@@ -250,11 +255,11 @@ method.</p>
 launch every process declared in the file whose scheduling pattern
 matches the current system time.</p>
 <p>Syntax rules for cron4j scheduling files are reported in the
-&quot;<a href="#p12">Cron parser</a>&quot; paragraph.</p>
+&quot;<a href="#p13">Cron parser</a>&quot; paragraph.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p05" id="p05"></a>
-<h2>5. Building your own task</h2>
+<a name="p06" id="p06"></a>
+<h2>6. Building your own task</h2>
 <p>A <em>java.lang.Runnable</em> object is the simplest task ever
 possible, but to gain control you need to extend the <a
 	href="api/it/sauronsoftware/cron4j/Task.html"><em>it.sauronsoftware.cron4j.Task</em></a>
@@ -281,7 +286,7 @@ context can be used in the following ways:</p>
 		href="api/it/sauronsoftware/cron4j/TaskExecutionContext.html#setStatusMessage(java.lang.String)"><em>setStatusMessage(String)</em></a>
 	method. This will propagate your task status message to its executor.
 	The status message, through the executor, can be retrieved by an
-	external user (see the &quot;<a href="#p08">Executors</a>&quot;
+	external user (see the &quot;<a href="#p09">Executors</a>&quot;
 	paragraph).</p>
 	</li>
 
@@ -298,7 +303,7 @@ context can be used in the following ways:</p>
 	method, with a value between 0 and 1. This will propagate your task
 	completeness level to its executor. The completeness level, through the
 	executor, can be retrieved by an external user (see the &quot;<a
-		href="#p08">Executors</a>&quot; paragraph).</p>
+		href="#p09">Executors</a>&quot; paragraph).</p>
 	</li>
 
 	<li>
@@ -310,7 +315,7 @@ context can be used in the following ways:</p>
 	periodically call the context <a
 		href="api/it/sauronsoftware/cron4j/TaskExecutionContext.html#pauseIfRequested()"><em>pauseIfRequested()</em></a>
 	method. This will pause the task execution until it will be resumed (or
-	stopped) by an external user (see the &quot;<a href="#p08">Executors</a>&quot;
+	stopped) by an external user (see the &quot;<a href="#p09">Executors</a>&quot;
 	paragraph).</p>
 	</li>
 
@@ -324,7 +329,7 @@ context can be used in the following ways:</p>
 		href="api/it/sauronsoftware/cron4j/TaskExecutionContext.html#isStopped()"><em>isStopped()</em></a>
 	method. This will return <em>true</em> when the execution has be
 	demanded to be stopped by an external user (see the &quot;<a
-		href="#p08">Executors</a>&quot; paragraph). Then it's your
+		href="#p09">Executors</a>&quot; paragraph). Then it's your
 	responsibility to handle the event, by letting your task gently stop
 	its ongoing activities.</p>
 	</li>
@@ -343,12 +348,12 @@ context can be used in the following ways:</p>
 
 </ul>
 
-<p>A custom task can be <a href="#p03">scheduled</a>, <a href="#p09">launched
-immediately</a> or returned by a <a href="#p06">task collector</a>.</p>
+<p>A custom task can be <a href="#p03">scheduled</a>, <a href="#p10">launched
+immediately</a> or returned by a <a href="#p07">task collector</a>.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p06" id="p06"></a>
-<h2>6. Building your own collector</h2>
+<a name="p07" id="p07"></a>
+<h2>7. Building your own collector</h2>
 <p>You can build and plug within the scheduler your own task source,
 via the <em>task collector</em> API.</p>
 <p>The cron4j scheduler supports the registration of one or more <a
@@ -378,8 +383,8 @@ external task source, i.e. a database or a XML file, which can be
 managed and changed in its contents also at run time.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p07" id="p07"></a>
-<h2>7. Building your own scheduler listener</h2>
+<a name="p08" id="p08"></a>
+<h2>8. Building your own scheduler listener</h2>
 <p>The <a href="api/it/sauronsoftware/cron4j/SchedulerListener.html"><em>it.sauronsoftware.cron4j.SchedulerListener</em></a>
 API can be used to listen to scheduler events.</p>
 <p>The <em>SchedulerListener</em> interface requires the
@@ -404,7 +409,7 @@ implementation of the following methods:</p>
 	exception.</p>
 	</li>
 </ul>
-<p>See the &quot;<a href="#p08">Executors</a>&quot; paragraph for
+<p>See the &quot;<a href="#p09">Executors</a>&quot; paragraph for
 more info about task executors.</p>
 <p>Once your <em>SchedulerListener</em> instance is ready, you can
 register it on a <em>Scheduler</em> object by calling its <a
@@ -419,8 +424,8 @@ method.</p>
 moment, also while the scheduler is running.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p08" id="p08"></a>
-<h2>8. Executors</h2>
+<a name="p09" id="p09"></a>
+<h2>9. Executors</h2>
 <p>The scheduler, once it has been started and it is running, can be
 queried to give back its <em>executors</em>. An executor is similar to a
 thread. Executors is used by the scheduler to execute tasks.</p>
@@ -430,7 +435,7 @@ thread. Executors is used by the scheduler to execute tasks.</p>
 method you can obtain the currently ongoing executors.</p>
 <p>You can also obtain an executor through a <a
 	href="api/it/sauronsoftware/cron4j/SchedulerListener.html"><em>SchedulerListener</em></a>
-instance (see the &quot;<a href="#p07">Building your own scheduler
+instance (see the &quot;<a href="#p08">Building your own scheduler
 listener</a>&quot; paragraph).</p>
 
 <p>Each executor, represented by a <a
@@ -571,8 +576,8 @@ methods:</p>
 
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p09" id="p09"></a>
-<h2>9. Manual task launch</h2>
+<a name="p10" id="p10"></a>
+<h2>10. Manual task launch</h2>
 <p>If the scheduler is started and running, it is possible to
 manually launch a task, without scheduling it with a pattern. The method
 is <a href="api/it/sauronsoftware/cron4j/Scheduler.html"><em>Scheduler</em></a>.<a
@@ -580,12 +585,12 @@ is <a href="api/it/sauronsoftware/cron4j/Scheduler.html"><em>Scheduler</em></a>.
 The task will be immediately launched, and a <a
 	href="api/it/sauronsoftware/cron4j/TaskExecutor.html"><em>TaskExecutor</em></a>
 instace is returned to the caller. The returned object can be used to
-control the task execution (see the &quot;<a href="#p08">Executors</a>&quot;
+control the task execution (see the &quot;<a href="#p09">Executors</a>&quot;
 paragraph).</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p10" id="p10"></a>
-<h2>10. Working with Time Zones</h2>
+<a name="p11" id="p11"></a>
+<h2>11. Working with Time Zones</h2>
 <p>Scheduler instances, by default, work with the system default
 Time Zone. I.e. a scheduling pattern whose value is <em>0 2 * * *</em>
 will activate its task at 02:00 AM according to the default system Time
@@ -612,8 +617,8 @@ in the given configuration at the given moment, any task scheduled as <em>0
 12 * * *</em> will be executed, while any <em>0 10 * * *</em> will not.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p11" id="p11"></a>
-<h2>11. Daemon threads</h2>
+<a name="p12" id="p12"></a>
+<h2>12. Daemon threads</h2>
 <p>The Java Virtual Machine exits when the only threads running are
 all daemon threads. The cron4j scheduler can be configured to spawn only
 daemon threads. To control this feature call the <a
@@ -626,8 +631,8 @@ status call the <a href="api/it/sauronsoftware/cron4j/Scheduler.html"><em>Schedu
 method.</p>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p12" id="p12"></a>
-<h2>12. Predictor</h2>
+<a name="p13" id="p13"></a>
+<h2>13. Predictor</h2>
 <p>The <a href="api/it/sauronsoftware/cron4j/Predictor.html"><em>it.sauronsoftware.cron4j.Predictor</em></a>
 class is able to predict when a scheduling pattern will be matched.</p>
 <p>Suppose you want to know when the scheduler will execute a task
@@ -642,8 +647,8 @@ for (int i = 0; i &lt; n; i++) {
 }</pre>
 <p><a href="#pIndex">Back to index</a></p>
 
-<a name="p13" id="p13"></a>
-<h2>13. Cron parser</h2>
+<a name="p14" id="p14"></a>
+<h2>14. Cron parser</h2>
 <p>The <a href="api/it/sauronsoftware/cron4j/CronParser.html"><em>it.sauronsoftware.cron4j.CronParser</em></a>
 class can be used to parse crontab-like formatted file and character
 streams.</p>

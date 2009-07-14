@@ -1,4 +1,4 @@
-RELEASE 2.1 - 2009-07-14
+RELEASE 2.1 - 2009-07-
 
 - The ProcessTask class has been added. Developers can use it to
   schedule system executable processes. Some other minor API
