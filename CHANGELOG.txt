@@ -1,3 +1,12 @@
+RELEASE 2.1 - 2009-07-14
+
+- The ProcessTask class has been added. Developers can use it to
+  schedule system executable processes. Some other minor API
+  changes have been made.
+
+(Thanks to Paul Parlett)
+
+
 RELEASE 2.0.1 - 2009-06-01
 
 - The SchedulingPattern parser has been rewritten to be 100% compliant
