@@ -236,8 +236,38 @@ method.</p>
 
 <a name="p04" id="p04"></a>
 <h2>4. How to schedule a system process</h2>
-<p>System processes can be easily scheduled using the <a href="api/it/sauronsoftware/cron4j/ProcessTask.html">ProcessTask</a> class.</p>
-<p>&nbsp;</p>
+<p>System processes can be easily scheduled using the <a href="api/it/sauronsoftware/cron4j/ProcessTask.html">ProcessTask</a> class:</p>
+<pre>ProcessTask task = new ProcessTask(&quot;C:\\Windows\\System32\\notepad.exe&quot;);
+Scheduler scheduler = new Scheduler();
+scheduler.schedule(&quot;* * * * *&quot;, task);
+scheduler.start();
+// ... </pre>
+<p>Arguments for the process can be supplied by using a string array instead of a single command string:</p> 
+<pre>String[] command = { &quot;C:\\Windows\\System32\\notepad.exe&quot;, &quot;C:\\File.txt&quot; };
+ProcessTask task = new ProcessTask(command);
+// ...</pre>
+<p>Environment variables for the process can be supplied using a second string array, whose elements have to be in the <em>NAME=VALUE</em> form:</p>
+<pre>String[] command = { &quot;C:\\tomcat\\bin\\catalina.bat&quot;, &quot;start&quot; };
+String[] envs = { &quot;CATALINA_HOME=C:\\tomcat&quot;, &quot;JAVA_HOME=C:\\jdks\\jdk5&quot; };
+ProcessTask task = new ProcessTask(command, envs);
+// ...</pre>
+<p>The default working directory for the process can be changed using a third parameter in the constructor:</p>
+<pre>String[] command = { &quot;C:\\tomcat\\bin\\catalina.bat&quot;, &quot;start&quot; };
+String[] envs = { &quot;CATALINA_HOME=C:\\tomcat&quot;, &quot;JAVA_HOME=C:\\jdks\\jdk5&quot; };
+File directory = "C:\\MyDirectory";
+ProcessTask task = new ProcessTask(command, envs, directory);
+// ...</pre>
+<p>If you want to change the default working directory but you have not any environment variable, the <em>envs</em> parameter of the constructor can be set to <em>null</em>:</p>
+<pre>ProcessTask task = new ProcessTask(command, null, directory);</pre>
+<p>When <em>envs</em> is <em>null</em> the process inherits every environment variable of the current JVM:</p>
+<p>Environment variables and the working directory can also be set by calling the <em><a href="api/it/sauronsoftware/cron4j/ProcessTask.html#setEnvs(java.lang.String[])">setEnvs(String[])</a></em> and <a href="api/it/sauronsoftware/cron4j/ProcessTask.html#setDirectory(java.io.File)"><em>setDirectory(java.io.File)</em></a> methods.</p>
+<p>The process standard output and standard error channels can be redirected to files by using the <a href="api/it/sauronsoftware/cron4j/ProcessTask.html#setStdoutFile(java.io.File)"><em>setStdoutFile(java.io.File)</em></a> and <a href="api/it/sauronsoftware/cron4j/ProcessTask.html#setStderrFile(java.io.File)"><em>setStderrFile(java.io.File)</em></a> methods:</p>
+<pre>ProcessTask task = new ProcessTask(command, envs, directory);
+task.setStdoutFile(new File(&quot;out.txt&quot;));
+task.setStderrFile(new File(&quot;err.txt&quot;));</pre>
+<p>In the same manner, the standard input channel can be read from an existing file, calling the <em><a href="api/it/sauronsoftware/cron4j/ProcessTask.html#setStdinFile(java.io.File)">setStdinFile(java.io.File)</a></em> method:</p>
+<pre>ProcessTask task = new ProcessTask(command, envs, directory);
+task.setStdinFile(new File(&quot;in.txt&quot;));</pre>
 
 <a name="p05" id="p05"></a>
 <h2>5. How to schedule processes from a file</h2>

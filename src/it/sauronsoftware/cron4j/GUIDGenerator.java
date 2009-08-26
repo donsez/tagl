@@ -32,13 +32,18 @@ import java.util.Enumeration;
 class GUIDGenerator {
 
 	/**
+	 * The machine descriptor, which is used to identified the underlying hardware machine.
+	 */
+	private static String MACHINE_DESCRIPTOR = getMachineDescriptor();
+	
+	/**
 	 * Generates a GUID (48 chars).
 	 * 
 	 * @return The generated GUID.
 	 */
 	public static String generate() {
 		StringBuffer id = new StringBuffer();
-		encode(id, getMachineDescriptor());
+		encode(id, MACHINE_DESCRIPTOR);
 		encode(id, Runtime.getRuntime());
 		encode(id, Thread.currentThread());
 		encode(id, System.currentTimeMillis());
