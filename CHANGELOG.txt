@@ -1,3 +1,11 @@
+RELEASE 
+
+- Bugfix: TimerThread is now spawned as a daemon, if the scheduler has
+  been set to act as a daemon with the setDaemon(true) method. 
+
+(Thanks to Cheong Chung Onn)
+
+
 RELEASE 2.1 - 2009-08-26
 
 - The ProcessTask class has been added. Developers can use it to

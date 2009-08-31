@@ -49,8 +49,7 @@ class TimerThread extends Thread {
 	public TimerThread(Scheduler scheduler) {
 		this.scheduler = scheduler;
 		// Thread name.
-		String name = "cron4j::scheduler[" + scheduler.getGuid() + "]::timer["
-				+ guid + "]";
+		String name = "cron4j::scheduler[" + scheduler.getGuid() + "]::timer[" + guid + "]";
 		setName(name);
 	}
 

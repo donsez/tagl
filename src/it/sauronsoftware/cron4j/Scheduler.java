@@ -568,6 +568,7 @@ public class Scheduler {
 			executors = new ArrayList();
 			// Starts the timer thread.
 			timer = new TimerThread(this);
+			timer.setDaemon(daemon);
 			timer.start();
 			// Change the state of the scheduler.
 			started = true;
