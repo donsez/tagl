@@ -169,10 +169,18 @@ Wednesday, Thursday and Friday.</p>
 character.</p>
 <p><strong>59 11 * * 1-5</strong><br />
 This pattern is equivalent to the previous one.</p>
-<p>The slash character can be used to identify periodic values, in
-the form a/b. A sub-pattern with the slash character is satisfied when
-the value on the left divided by the one on the right gives an integer
-result (a % b == 0).</p>
+
+<p>The slash character can be used to identify step values within a range. It
+can be used both in the form <em>*&#47;c</em> and <em>a-b/c</em>. The subpattern
+is matched every <em>c</em> values of the range <em>0,maxvalue</em> or 
+<em>a-b</em>.</p>
+<p><strong>*&#47;5 * * * *</strong><br />
+This pattern causes a task to be launched every 5 minutes (0:00, 0:05, 0:10,
+0:15 and so on).</p>
+<p><strong>3-18&#47;5 * * * *</strong><br />
+This pattern causes a task to be launched every 5 minutes starting from the
+third minute of the hour, up to the 18th (0:03, 0:08, 0:13, 0:18, 1:03, 1:08
+and so on).</p>
 <p><strong>*&#47;15 9-17 * * *</strong><br />
 This pattern causes a task to be launched every 15 minutes between the
 9th and 17th hour of the day (9:00, 9:15, 9:30, 9:45 and so on... note
@@ -182,7 +190,7 @@ that the last execution will be at 17:45).</p>
 <p><strong>* 12 10-16/2 * *</strong><br />
 This pattern causes a task to be launched every minute during the 12th
 hour of the day, but only if the day is the 10th, the 12th, the 14th or
-the16th of the month.</p>
+the 16th of the month.</p>
 <p><strong>* 12 1-15,17,20-25 * *</strong><br />
 This pattern causes a task to be launched every minute during the 12th
 hour of the day, but the day of the month must be between the 1st and

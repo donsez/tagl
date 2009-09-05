@@ -177,15 +177,25 @@ venerd&igrave;.</p>
 <p><strong>59 11 * * 1-5</strong><br />
 Questo pattern &egrave;, nel significato, identico al precedente.</p>
 
-<p>Il carattere slash pu&ograve; essere usato in un sotto-pattern per
-stabilire degli intervalli di esecuzione:</p>
+<p>Il carattere slash pu&ograve; essere usato per identificare dei valori
+all'interno di un range. Si usa sia nella forma <em>*&#47;c</em> sia in quella
+<em>a-b/c</em>. Il sottopattern cos&igrave; espresso viene soddisfatto ogni
+<em>c</em> valori che sono nel range <em>0,valore-massimo</em> oppure
+<em>a-b</em>.</p>
+<p><strong>*&#47;5 * * * *</strong><br />
+Questo pattern avvia il task collegato ogni 5 minuti (0:00, 0:05, 0:10, 0:15
+e cos&igrave; via).</p>
+<p><strong>3-18&#47;5 * * * *</strong><br />
+Questo pattern avvia il task collegato ogni 5 minuti a partire dal terzo di
+ogni ora, fino al diciottesimo (0:03, 0:08, 0:13, 0:18, 1:03, 1:08 e cos&igrave;
+via).</p>
 <p><strong>*&#47;15 9-17 * * *</strong><br />
 Questo pattern avvia il task cui &egrave; collegato ogni 15 minuti nelle ore
 che vanno dalle 9 alle 17. In pratica il task sar&agrave; avviato alle 09:00,
 alle 09:15, alle 09:30, alle 09:45, alle 10:00 e cos&igrave; via, fino ad
 arrivare alle 17:45.</p>
-<p><strong>* 12 10-16/2 * *</strong><br />
 
+<p><strong>* 12 10-16/2 * *</strong><br />
 Questo pattern avvia il task cui &egrave; collegato ogni minuto delle ore 12,
 ogni due giorni nell'intervallo 10-16.</p>
 <p><strong>* 12 10,12,14,16 * *</strong><br />

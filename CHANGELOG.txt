@@ -1,9 +1,14 @@
-RELEASE 
+RELEASE 2.1.1 - 
 
 - Bugfix: TimerThread is now spawned as a daemon, if the scheduler has
-  been set to act as a daemon with the setDaemon(true) method. 
+  been set to act as a daemon with the setDaemon(true) method.
+- The step values parser has been changed to be more compliant with the
+  majority of the cron implementations. Now "a-b/c" means "took a value
+  every c elements in the range a-b", and no more "took every element
+  within the a-b range whose value can be divided by c". In example
+  "2-12/5" means now "2,7,12", while before it was "5,10". 
 
-(Thanks to Cheong Chung Onn)
+(Thanks to Cheong Chung Onn and Bryan Keller)
 
 
 RELEASE 2.1 - 2009-08-26

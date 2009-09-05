@@ -64,21 +64,21 @@ import java.util.TimeZone;
  * Some examples:
  * </p>
  * <p>
- * <strong>5 * * * *</strong><br>
+ * <strong>5 * * * *</strong><br />
  * This pattern causes a task to be launched once every hour, at the begin of
  * the fifth minute (00:05, 01:05, 02:05 etc.).
  * </p>
  * <p>
- * <strong>* * * * *</strong><br>
+ * <strong>* * * * *</strong><br />
  * This pattern causes a task to be launched every minute.
  * </p>
  * <p>
- * <strong>* 12 * * Mon</strong><br>
+ * <strong>* 12 * * Mon</strong><br />
  * This pattern causes a task to be launched every minute during the 12th hour
  * of Monday.
  * </p>
  * <p>
- * <strong>* 12 16 * Mon</strong><br>
+ * <strong>* 12 16 * Mon</strong><br />
  * This pattern causes a task to be launched every minute during the 12th hour
  * of Monday, 16th, but only if the day is the 16th of the month.
  * </p>
@@ -86,7 +86,7 @@ import java.util.TimeZone;
  * Every sub-pattern can contain two or more comma separated values.
  * </p>
  * <p>
- * <strong>59 11 * * 1,2,3,4,5</strong><br>
+ * <strong>59 11 * * 1,2,3,4,5</strong><br />
  * This pattern causes a task to be launched at 11:59AM on Monday, Tuesday,
  * Wednesday, Thursday and Friday.
  * </p>
@@ -94,16 +94,28 @@ import java.util.TimeZone;
  * Values intervals are admitted and defined using the minus character.
  * </p>
  * <p>
- * <strong>59 11 * * 1-5</strong><br>
+ * <strong>59 11 * * 1-5</strong><br />
  * This pattern is equivalent to the previous one.
  * </p>
  * <p>
- * The slash character can be used to identify periodic values, in the form a/b.
- * A sub-pattern with the slash character is satisfied when the value on the
- * left divided by the one on the right gives an integer result (a % b == 0).
+ * The slash character can be used to identify step values within a range. It
+ * can be used both in the form <em>*&#47;c</em> and <em>a-b/c</em>. The
+ * subpattern is matched every <em>c</em> values of the range
+ * <em>0,maxvalue</em> or <em>a-b</em>.
  * </p>
  * <p>
- * <strong>*&#47;15 9-17 * * *</strong><br>
+ * <strong>*&#47;5 * * * *</strong><br />
+ * This pattern causes a task to be launched every 5 minutes (0:00, 0:05, 0:10,
+ * 0:15 and so on).
+ * </p>
+ * <p>
+ * <strong>3-18&#47;5 * * * *</strong><br />
+ * This pattern causes a task to be launched every 5 minutes starting from the
+ * third minute of the hour, up to the 18th (0:03, 0:08, 0:13, 0:18, 1:03, 1:08
+ * and so on).
+ * </p>
+ * <p>
+ * <strong>*&#47;15 9-17 * * *</strong><br />
  * This pattern causes a task to be launched every 15 minutes between the 9th
  * and 17th hour of the day (9:00, 9:15, 9:30, 9:45 and so on... note that the
  * last execution will be at 17:45).
@@ -112,13 +124,13 @@ import java.util.TimeZone;
  * All the fresh described syntax rules can be used together.
  * </p>
  * <p>
- * <strong>* 12 10-16/2 * *</strong><br>
+ * <strong>* 12 10-16&#47;2 * *</strong><br />
  * This pattern causes a task to be launched every minute during the 12th hour
- * of the day, but only if the day is the 10th, the 12th, the 14th or the16th of
- * the month.
+ * of the day, but only if the day is the 10th, the 12th, the 14th or the 16th
+ * of the month.
  * </p>
  * <p>
- * <strong>* 12 1-15,17,20-25 * *</strong><br>
+ * <strong>* 12 1-15,17,20-25 * *</strong><br />
  * This pattern causes a task to be launched every minute during the 12th hour
  * of the day, but the day of the month must be between the 1st and the 15th,
  * the 20th and the 25, or at least it must be the 17th.
@@ -128,7 +140,7 @@ import java.util.TimeZone;
  * pipe character:
  * </p>
  * <p>
- * <strong>0 5 * * *|8 10 * * *|22 17 * * *</strong><br>
+ * <strong>0 5 * * *|8 10 * * *|22 17 * * *</strong><br />
  * This pattern causes a task to be launched every day at 05:00, 10:08 and
  * 17:22.
  * </p>
@@ -137,7 +149,7 @@ import java.util.TimeZone;
  * @since 2.0
  */
 public class SchedulingPattern {
-	
+
 	/**
 	 * The parser for the minute values.
 	 */
@@ -227,38 +239,57 @@ public class SchedulingPattern {
 		this.asString = pattern;
 		StringTokenizer st1 = new StringTokenizer(pattern, "|");
 		if (st1.countTokens() < 1) {
-			throw new InvalidPatternException("invalid pattern: \"" + pattern + "\"");
+			throw new InvalidPatternException("invalid pattern: \"" + pattern
+					+ "\"");
 		}
 		while (st1.hasMoreTokens()) {
 			String localPattern = st1.nextToken();
 			StringTokenizer st2 = new StringTokenizer(localPattern, " \t");
 			if (st2.countTokens() != 5) {
-				throw new InvalidPatternException("invalid pattern: \"" + localPattern + "\"");
+				throw new InvalidPatternException("invalid pattern: \""
+						+ localPattern + "\"");
 			}
 			try {
-				minuteMatchers.add(buildValueMatcher(st2.nextToken(), MINUTE_VALUE_PARSER));
+				minuteMatchers.add(buildValueMatcher(st2.nextToken(),
+						MINUTE_VALUE_PARSER));
 			} catch (Exception e) {
-				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing minutes field: " + e.getMessage() + ".");
+				throw new InvalidPatternException("invalid pattern \""
+						+ localPattern + "\". Error parsing minutes field: "
+						+ e.getMessage() + ".");
 			}
 			try {
-				hourMatchers.add(buildValueMatcher(st2.nextToken(), HOUR_VALUE_PARSER));
+				hourMatchers.add(buildValueMatcher(st2.nextToken(),
+						HOUR_VALUE_PARSER));
 			} catch (Exception e) {
-				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing hours field: " + e.getMessage() + ".");
+				throw new InvalidPatternException("invalid pattern \""
+						+ localPattern + "\". Error parsing hours field: "
+						+ e.getMessage() + ".");
 			}
 			try {
-				dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_MONTH_VALUE_PARSER));
+				dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(),
+						DAY_OF_MONTH_VALUE_PARSER));
 			} catch (Exception e) {
-				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing days of month field: " + e.getMessage() + ".");
+				throw new InvalidPatternException("invalid pattern \""
+						+ localPattern
+						+ "\". Error parsing days of month field: "
+						+ e.getMessage() + ".");
 			}
 			try {
-				monthMatchers.add(buildValueMatcher(st2.nextToken(), MONTH_VALUE_PARSER));
+				monthMatchers.add(buildValueMatcher(st2.nextToken(),
+						MONTH_VALUE_PARSER));
 			} catch (Exception e) {
-				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing months field: " + e.getMessage() + ".");
+				throw new InvalidPatternException("invalid pattern \""
+						+ localPattern + "\". Error parsing months field: "
+						+ e.getMessage() + ".");
 			}
 			try {
-				dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_WEEK_VALUE_PARSER));
+				dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(),
+						DAY_OF_WEEK_VALUE_PARSER));
 			} catch (Exception e) {
-				throw new InvalidPatternException("invalid pattern \"" + localPattern + "\". Error parsing days of week field: " + e.getMessage() + ".");
+				throw new InvalidPatternException("invalid pattern \""
+						+ localPattern
+						+ "\". Error parsing days of week field: "
+						+ e.getMessage() + ".");
 			}
 			matcherSize++;
 		}
@@ -275,7 +306,8 @@ public class SchedulingPattern {
 	 * @throws Exception
 	 *             If the supplied pattern part is not valid.
 	 */
-	private ValueMatcher buildValueMatcher(String str, ValueParser parser) throws Exception {
+	private ValueMatcher buildValueMatcher(String str, ValueParser parser)
+			throws Exception {
 		if (str.length() == 1 && str.equals("*")) {
 			return new AlwaysTrueValueMatcher();
 		}
@@ -287,7 +319,9 @@ public class SchedulingPattern {
 			try {
 				local = parseListElement(element, parser);
 			} catch (Exception e) {
-				throw new Exception("invalid field \"" + str + "\", invalid element \"" + element + "\", " + e.getMessage());
+				throw new Exception("invalid field \"" + str
+						+ "\", invalid element \"" + element + "\", "
+						+ e.getMessage());
 			}
 			for (Iterator i = local.iterator(); i.hasNext();) {
 				Object value = i.next();
@@ -313,7 +347,8 @@ public class SchedulingPattern {
 	 * @throws Exception
 	 *             If the supplied pattern part is not valid.
 	 */
-	private ArrayList parseListElement(String str, ValueParser parser) throws Exception {
+	private ArrayList parseListElement(String str, ValueParser parser)
+			throws Exception {
 		StringTokenizer st = new StringTokenizer(str, "/");
 		int size = st.countTokens();
 		if (size < 1 || size > 2) {
@@ -337,11 +372,8 @@ public class SchedulingPattern {
 				throw new Exception("non positive divisor \"" + div + "\"");
 			}
 			ArrayList values2 = new ArrayList();
-			for (Iterator i = values.iterator(); i.hasNext();) {
-				Integer value = (Integer) i.next();
-				if (value.intValue() % div == 0) {
-					values2.add(value);
-				}
+			for (int i = 0; i < values.size(); i += div) {
+				values2.add(values.get(i));
 			}
 			return values2;
 		} else {
@@ -360,7 +392,8 @@ public class SchedulingPattern {
 	 * @throws Exception
 	 *             If the supplied pattern part is not valid.
 	 */
-	private ArrayList parseRange(String str, ValueParser parser) throws Exception {
+	private ArrayList parseRange(String str, ValueParser parser)
+			throws Exception {
 		if (str.equals("*")) {
 			int[] all = parser.getAllPossibleValues();
 			ArrayList values = new ArrayList();
@@ -379,7 +412,8 @@ public class SchedulingPattern {
 		try {
 			v1 = parser.parse(v1Str);
 		} catch (Exception e) {
-			throw new Exception("invalid value \"" + v1Str + "\", " + e.getMessage());
+			throw new Exception("invalid value \"" + v1Str + "\", "
+					+ e.getMessage());
 		}
 		if (size == 1) {
 			ArrayList values = new ArrayList();
@@ -391,7 +425,8 @@ public class SchedulingPattern {
 			try {
 				v2 = parser.parse(v2Str);
 			} catch (Exception e) {
-				throw new Exception("invalid value \"" + v2Str + "\", " + e.getMessage());
+				throw new Exception("invalid value \"" + v2Str + "\", "
+						+ e.getMessage());
 			}
 			int s1 = Math.min(v1, v2);
 			int s2 = Math.max(v1, v2);
@@ -424,9 +459,11 @@ public class SchedulingPattern {
 		for (int i = 0; i < matcherSize; i++) {
 			ValueMatcher minuteMatcher = (ValueMatcher) minuteMatchers.get(i);
 			ValueMatcher hourMatcher = (ValueMatcher) hourMatchers.get(i);
-			ValueMatcher dayOfMonthMatcher = (ValueMatcher) dayOfMonthMatchers.get(i);
+			ValueMatcher dayOfMonthMatcher = (ValueMatcher) dayOfMonthMatchers
+					.get(i);
 			ValueMatcher monthMatcher = (ValueMatcher) monthMatchers.get(i);
-			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers.get(i);
+			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers
+					.get(i);
 			boolean eval = minuteMatcher.match(minute)
 					&& hourMatcher.match(hour)
 					&& dayOfMonthMatcher.match(dayOfMonth)
@@ -499,7 +536,7 @@ public class SchedulingPattern {
 		 *             If the value can't be parsed.
 		 */
 		public int parse(String value) throws Exception;
-		
+
 		/**
 		 * Returns a list of all the values allowed.
 		 * 
@@ -560,7 +597,7 @@ public class SchedulingPattern {
 		}
 
 	}
-	
+
 	/**
 	 * The minutes value parser.
 	 */
@@ -572,7 +609,7 @@ public class SchedulingPattern {
 		public MinuteValueParser() {
 			super(0, 59);
 		}
-		
+
 	}
 
 	/**
@@ -586,7 +623,7 @@ public class SchedulingPattern {
 		public HourValueParser() {
 			super(0, 59);
 		}
-		
+
 	}
 
 	/**
@@ -600,7 +637,7 @@ public class SchedulingPattern {
 		public DayOfMonthValueParser() {
 			super(1, 31);
 		}
-		
+
 	}
 
 	/**
@@ -611,7 +648,8 @@ public class SchedulingPattern {
 		/**
 		 * Months aliases.
 		 */
-		private static String[] ALIASES = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+		private static String[] ALIASES = { "jan", "feb", "mar", "apr", "may",
+				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
 		/**
 		 * Builds the months value parser.
@@ -629,7 +667,7 @@ public class SchedulingPattern {
 				return parseAlias(value, ALIASES, 1);
 			}
 		}
-		
+
 	}
 
 	/**
@@ -640,7 +678,8 @@ public class SchedulingPattern {
 		/**
 		 * Days of week aliases.
 		 */
-		private static String[] ALIASES = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+		private static String[] ALIASES = { "sun", "mon", "tue", "wed", "thu",
+				"fri", "sat" };
 
 		/**
 		 * Builds the months value parser.
