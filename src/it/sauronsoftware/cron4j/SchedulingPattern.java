@@ -28,7 +28,7 @@ import java.util.TimeZone;
 
 /**
  * <p>
- * A UNIX crontab-like pattern is a string splitted in five space separated
+ * A UNIX crontab-like pattern is a string split in five space separated
  * parts. Each part is intented as:
  * </p>
  * <ol>
