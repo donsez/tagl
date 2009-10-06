@@ -121,6 +121,25 @@ import java.util.ArrayList;
  * 1.3.</li>
  * </ul>
  * <p>
+ * It is also possible to schedule the invocation of a method of a Java class in
+ * the scope of the parser ClassLoader. The method has to be static and it must
+ * accept an array of strings as its sole argument. To invoke a method of this
+ * kind the syntax is:
+ * </p>
+ * 
+ * <pre>
+ * scheduling-pattern java:className#methodName [args]
+ * </pre>
+ * <p>
+ * The <em>#methodName</em> part can be omitted: in this case the
+ * <em>main(String[])</em> method will be assumed.
+ * </p>
+ * <p>
+ * Please note that static methods are invoked within the scheduler same JVM,
+ * without spawning any external process. Thus IN, OUT, ERR, ENV and DIR options
+ * can't be applied.
+ * </p>
+ * <p>
  * Invalid scheduling lines are discarded without blocking the parsing
  * procedure, but an error message is printed in the application standard error
  * channel.
@@ -134,6 +153,7 @@ import java.util.ArrayList;
  * 0,30 * * * * OUT:C:\ping.txt ping 10.9.43.55
  * 0,30 4 * * * &quot;OUT:C:\Documents and Settings\Carlo\ping.txt&quot; ping 10.9.43.55
  * 0 3 * * * ENV:JAVA_HOME=C:\jdks\1.4.2_15 DIR:C:\myproject OUT:C:\myproject\build.log C:\myproject\build.bat &quot;Nightly Build&quot;
+ * 0 4 * * * java:mypackage.MyClass#startApplication myOption1 myOption2
  * </pre>
  * 
  * @author Carlo Pelliccia
@@ -375,7 +395,8 @@ public class CronParser {
 		File stdoutFile = null;
 		File stderrFile = null;
 		ArrayList envsList = new ArrayList();
-		ArrayList commandList = new ArrayList();
+		String command = null;
+		ArrayList argsList = new ArrayList();
 		for (int i = 0; i < size; i++) {
 			String tk = (String) splitted.get(i);
 			// Check the local status.
@@ -401,52 +422,84 @@ public class CronParser {
 				}
 			}
 			if (status == 1) {
-				// Command and its arguments
-				commandList.add(tk);
+				// Command or argument?
+				if (command == null) {
+					command = tk;
+				} else {
+					argsList.add(tk);
+				}
 			}
 		}
-		// Command validation.
-		String[] cmdarray = null;
-		size = commandList.size();
-		if (size == 0) {
+		// Task preparing.
+		Task task;
+		// Command evaluation.
+		if (command == null) {
+			// No command!
 			throw new Exception("Invalid cron line: " + line);
+		} else if (command.startsWith("java:")) {
+			// Java inner-process.
+			String className = command.substring(5);
+			if (className.length() == 0) {
+				throw new Exception("Invalid Java class name on line: " + line);
+			}
+			String methodName;
+			int sep = className.indexOf('#');
+			if (sep == -1) {
+				methodName = "main";
+			} else {
+				methodName = className.substring(sep + 1);
+				className = className.substring(0, sep);
+				if (methodName.length() == 0) {
+					throw new Exception("Invalid Java method name on line: "
+							+ line);
+				}
+			}
+			String[] args = new String[argsList.size()];
+			for (int i = 0; i < argsList.size(); i++) {
+				args[i] = (String) argsList.get(i);
+			}
+			task = new StaticMethodTask(className, methodName, args);
 		} else {
-			cmdarray = new String[size];
-			for (int i = 0; i < size; i++) {
-				cmdarray[i] = (String) commandList.get(i);
+			// External command.
+			String[] cmdarray = new String[1 + argsList.size()];
+			cmdarray[0] = command;
+			for (int i = 0; i < argsList.size(); i++) {
+				cmdarray[i + 1] = (String) argsList.get(i);
 			}
-		}
-		// Environments.
-		String[] envs = null;
-		size = envsList.size();
-		if (size > 0) {
-			envs = new String[size];
-			for (int i = 0; i < size; i++) {
-				envs[i] = (String) envsList.get(i);
+			// Environments.
+			String[] envs = null;
+			size = envsList.size();
+			if (size > 0) {
+				envs = new String[size];
+				for (int i = 0; i < size; i++) {
+					envs[i] = (String) envsList.get(i);
+				}
 			}
-		}
-		// Working directory.
-		File dir = null;
-		if (dirString != null) {
-			dir = new File(dirString);
-			if (!dir.exists() || !dir.isDirectory()) {
-				throw new Exception(
-						"Invalid cron working directory parameter at line: "
-								+ line, new FileNotFoundException(dirString
-								+ " doesn't exist or it is not a directory"));
+			// Working directory.
+			File dir = null;
+			if (dirString != null) {
+				dir = new File(dirString);
+				if (!dir.exists() || !dir.isDirectory()) {
+					throw new Exception(
+							"Invalid cron working directory parameter at line: "
+									+ line,
+							new FileNotFoundException(dirString
+									+ " doesn't exist or it is not a directory"));
+				}
 			}
-		}
-		// Builds the task.
-		ProcessTask task = new ProcessTask(cmdarray, envs, dir);
-		// Channels.
-		if (stdinFile != null) {
-			task.setStdinFile(stdinFile);
-		}
-		if (stdoutFile != null) {
-			task.setStdoutFile(stdoutFile);
-		}
-		if (stderrFile != null) {
-			task.setStderrFile(stderrFile);
+			// Builds the task.
+			ProcessTask process = new ProcessTask(cmdarray, envs, dir);
+			// Channels.
+			if (stdinFile != null) {
+				process.setStdinFile(stdinFile);
+			}
+			if (stdoutFile != null) {
+				process.setStdoutFile(stdoutFile);
+			}
+			if (stderrFile != null) {
+				process.setStderrFile(stderrFile);
+			}
+			task = process;
 		}
 		// End.
 		table.add(new SchedulingPattern(pattern), task);

@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>cron4j 2.1 manual</title>
+<title>cron4j 2.2 manual</title>
 </head>
 <body>
 <a name="pIndex" id="pIndex"></a>
-<h1>cron4j 2.1 manual</h1>
+<h1>cron4j 2.2 manual</h1>
 <h3>Index</h3>
 <ol>
 	<li><a href="#p01">Quickstart</a></li>
@@ -759,6 +759,16 @@ the following elements:</p>
 	directory for the command. This feature is not supported if the
 	executing JVM is less than 1.3.</li>
 </ul>
+<p>It is also possible to schedule the invocation of a method of a Java class in
+the scope of the parser ClassLoader. The method has to be static and it must
+accept an array of strings as its sole argument. To invoke a method of this
+kind the syntax is:</p>
+<pre>scheduling-pattern java:className#methodName [args]</pre>
+<p>The <em>#methodName</em> part can be omitted: in this case the
+<em>main(String[])</em> method will be assumed.</p>
+<p>Please note that static methods are invoked within the scheduler same JVM,
+without spawning any external process. Thus IN, OUT, ERR, ENV and DIR
+options can't be applied.</p>
 <p>Invalid scheduling lines are discarded without blocking the
 parsing procedure, but an error message is sent to the application
 standard error channel.</p>
@@ -766,7 +776,8 @@ standard error channel.</p>
 <pre>0 5 * * * sol.exe
 0,30 * * * * OUT:C:\ping.txt ping 10.9.43.55
 0,30 4 * * * &quot;OUT:C:\Documents and Settings\Carlo\ping.txt&quot; ping 10.9.43.55
-0 3 * * * ENV:JAVA_HOME=C:\jdks\1.4.2_15 DIR:C:\myproject OUT:C:\myproject\build.log C:\myproject\build.bat &quot;Nightly Build&quot;</pre>
+0 3 * * * ENV:JAVA_HOME=C:\jdks\1.4.2_15 DIR:C:\myproject OUT:C:\myproject\build.log C:\myproject\build.bat &quot;Nightly Build&quot;
+0 4 * * * java:mypackage.MyClass#startApplication myOption1 myOption2</pre>
 <p><a href="#pIndex">Back to index</a></p>
 
 </body>

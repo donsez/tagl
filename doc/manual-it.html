@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Manuale di cron4j 2.1</title>
+<title>Manuale di cron4j 2.2</title>
 </head>
 <body>
 <a name="pIndex" id="pIndex"></a>
-<h1>Manuale di cron4j 2.1</h1>
+<h1>Manuale di cron4j 2.2</h1>
 <h3>Index</h3>
 <ol>
 	<li><a href="#p01">Per cominciare</a></li>
@@ -548,14 +548,26 @@ pu&ograve; essere usata per interpretare testi simili a quelli utilizzati nel fi
 	<li>OUT:<em>file-path</em> - Redirige il canale di standard output del comando sul file al percorso specificato.</li>
 	<li>ERR:<em>file-path</em> - Redirige il canale di standard error del comando sul file al percorso specificato.</li>
 	<li>ENV:<em>name</em>=<em>value</em> - Definisce una variabile di ambiente valida durante l'esecuzione del comando.</li>
-	<li>DIR:<em>directory-path</em> - Imposta la directory di lavoro del comando. Questa	funzionalit&agrave; non &egrave; supportata se la JVM che esegue lo scheduler &egrave; antecedente alla versione 1.3.</li>
+	<li>DIR:<em>directory-path</em> - Imposta la directory di lavoro del comando. Questa funzionalit&agrave; non &egrave; supportata se la JVM che esegue lo scheduler &egrave; antecedente alla versione 1.3.</li>
 </ul>
-<p>Linee di schedulazione non valide vengono scartate senza bloccare l'operazione di parsing, ma un messaggio di errore viene emesso sul canale di standard error dell'applicazione.</p>
+<p>Si pu&ograve; schedulare anche l'invocazione di un metodo di una classe Java, purch&eacute;
+la classe possa essere caricara dal ClassLoader che carica lo scheduler. Il metodo, nello specifico,
+deve essere statico e deve accettare come solo argomento un array di stringhe. Un metodo di
+questo tipo pu&ograve; essere richiamato con una linea del seguente tipo:</p>
+<pre>scheduling-pattern java:nomeClasse#nomeMetodo [args]</pre>
+<p>La parte <em>#nomeMetodo</em> pu&ograve; essere omessa: in questo caso sar&agrave; ricercato
+automaticamente il metodo <em>main(String[])</em>.</p>
+<p>Si faccia attenziona al fatto che i metodi statici vengono invocati ed eseguiti
+all'interno della stessa JVM che esegue lo scheduler. Pertanto non &egrave; possibile
+applicare ai task di questo tipo le opzioni IN, OUT, ERR, ENV e DIR, valide invece per
+i processi.</p>
+<p>Le linee di schedulazione non valide vengono scartate senza bloccare l'operazione di parsing, ma un messaggio di errore viene emesso sul canale di standard error dell'applicazione.</p>
 <p>Ecco qualche esempio di linee di scheduling valide su un sistema Windows:</p>
 <pre>0 5 * * * sol.exe
 0,30 * * * * OUT:C:\ping.txt ping 10.9.43.55
 0,30 4 * * * &quot;OUT:C:\Documents and Settings\Carlo\ping.txt&quot; ping 10.9.43.55
-0 3 * * * ENV:JAVA_HOME=C:\jdks\1.4.2_15 DIR:C:\myproject OUT:C:\myproject\build.log C:\myproject\build.bat &quot;Nightly Build&quot;</pre>
+0 3 * * * ENV:JAVA_HOME=C:\jdks\1.4.2_15 DIR:C:\myproject OUT:C:\myproject\build.log C:\myproject\build.bat &quot;Nightly Build&quot;
+0 4 * * * java:mypackage.MyClass#startApplication myOption1 myOption2</pre>
 <p><a href="#pIndex">Torna all'indice</a></p>
 
 </body>

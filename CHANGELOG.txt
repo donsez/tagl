@@ -1,3 +1,12 @@
+RELEASE 2.2 - 
+
+- The CronParser has been enhanced. Before this release a cron line
+  could be used only to launch external process. Now it can be used
+  also to invoke a static method within a class.
+  
+(Thanks to Sikora Tomasz)
+
+
 RELEASE 2.1.1 - 2009-09-18
 
 - Bugfix: TimerThread is now spawned as a daemon, if the scheduler has
