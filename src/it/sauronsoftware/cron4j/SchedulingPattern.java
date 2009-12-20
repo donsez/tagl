@@ -20,7 +20,6 @@ package it.sauronsoftware.cron4j;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -450,7 +449,8 @@ public class SchedulingPattern {
 	 */
 	public boolean match(TimeZone timezone, long millis) {
 		GregorianCalendar gc = new GregorianCalendar();
-		gc.setTime(new Date(millis));
+		gc.setTimeInMillis(millis);
+		gc.setTimeZone(timezone);
 		int minute = gc.get(Calendar.MINUTE);
 		int hour = gc.get(Calendar.HOUR_OF_DAY);
 		int dayOfMonth = gc.get(Calendar.DAY_OF_MONTH);
@@ -459,11 +459,9 @@ public class SchedulingPattern {
 		for (int i = 0; i < matcherSize; i++) {
 			ValueMatcher minuteMatcher = (ValueMatcher) minuteMatchers.get(i);
 			ValueMatcher hourMatcher = (ValueMatcher) hourMatchers.get(i);
-			ValueMatcher dayOfMonthMatcher = (ValueMatcher) dayOfMonthMatchers
-					.get(i);
+			ValueMatcher dayOfMonthMatcher = (ValueMatcher) dayOfMonthMatchers.get(i);
 			ValueMatcher monthMatcher = (ValueMatcher) monthMatchers.get(i);
-			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers
-					.get(i);
+			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers.get(i);
 			boolean eval = minuteMatcher.match(minute)
 					&& hourMatcher.match(hour)
 					&& dayOfMonthMatcher.match(dayOfMonth)
