@@ -1,7 +1,7 @@
 /*
  * cron4j - A pure Java cron-like scheduler
  * 
- * Copyright (C) 2007-2009 Carlo Pelliccia (www.sauronsoftware.it)
+ * Copyright (C) 2007-2010 Carlo Pelliccia (www.sauronsoftware.it)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version

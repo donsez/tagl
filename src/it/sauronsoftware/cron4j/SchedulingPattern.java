@@ -1,7 +1,7 @@
 /*
  * cron4j - A pure Java cron-like scheduler
  * 
- * Copyright (C) 2007-2009 Carlo Pelliccia (www.sauronsoftware.it)
+ * Copyright (C) 2007-2010 Carlo Pelliccia (www.sauronsoftware.it)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version
@@ -27,8 +27,8 @@ import java.util.TimeZone;
 
 /**
  * <p>
- * A UNIX crontab-like pattern is a string split in five space separated
- * parts. Each part is intented as:
+ * A UNIX crontab-like pattern is a string split in five space separated parts.
+ * Each part is intented as:
  * </p>
  * <ol>
  * <li><strong>Minutes sub-pattern</strong>. During which minutes of the hour
@@ -36,7 +36,8 @@ import java.util.TimeZone;
  * <li><strong>Hours sub-pattern</strong>. During which hours of the day should
  * the task been launched? The values range is from 0 to 23.</li>
  * <li><strong>Days of month sub-pattern</strong>. During which days of the
- * month should the task been launched? The values range is from 0 to 31.</li>
+ * month should the task been launched? The values range is from 0 to 31. The
+ * special value L can be used to recognize the last day of month.</li>
  * <li><strong>Months sub-pattern</strong>. During which months of the year
  * should the task been launched? The values range is from 1 (January) to 12
  * (December), otherwise this sub-pattern allows the aliases &quot;jan&quot;,
@@ -238,35 +239,30 @@ public class SchedulingPattern {
 		this.asString = pattern;
 		StringTokenizer st1 = new StringTokenizer(pattern, "|");
 		if (st1.countTokens() < 1) {
-			throw new InvalidPatternException("invalid pattern: \"" + pattern
-					+ "\"");
+			throw new InvalidPatternException("invalid pattern: \"" + pattern + "\"");
 		}
 		while (st1.hasMoreTokens()) {
 			String localPattern = st1.nextToken();
 			StringTokenizer st2 = new StringTokenizer(localPattern, " \t");
 			if (st2.countTokens() != 5) {
-				throw new InvalidPatternException("invalid pattern: \""
-						+ localPattern + "\"");
+				throw new InvalidPatternException("invalid pattern: \"" + localPattern + "\"");
 			}
 			try {
-				minuteMatchers.add(buildValueMatcher(st2.nextToken(),
-						MINUTE_VALUE_PARSER));
+				minuteMatchers.add(buildValueMatcher(st2.nextToken(), MINUTE_VALUE_PARSER));
 			} catch (Exception e) {
 				throw new InvalidPatternException("invalid pattern \""
 						+ localPattern + "\". Error parsing minutes field: "
 						+ e.getMessage() + ".");
 			}
 			try {
-				hourMatchers.add(buildValueMatcher(st2.nextToken(),
-						HOUR_VALUE_PARSER));
+				hourMatchers.add(buildValueMatcher(st2.nextToken(), HOUR_VALUE_PARSER));
 			} catch (Exception e) {
 				throw new InvalidPatternException("invalid pattern \""
 						+ localPattern + "\". Error parsing hours field: "
 						+ e.getMessage() + ".");
 			}
 			try {
-				dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(),
-						DAY_OF_MONTH_VALUE_PARSER));
+				dayOfMonthMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_MONTH_VALUE_PARSER));
 			} catch (Exception e) {
 				throw new InvalidPatternException("invalid pattern \""
 						+ localPattern
@@ -274,16 +270,14 @@ public class SchedulingPattern {
 						+ e.getMessage() + ".");
 			}
 			try {
-				monthMatchers.add(buildValueMatcher(st2.nextToken(),
-						MONTH_VALUE_PARSER));
+				monthMatchers.add(buildValueMatcher(st2.nextToken(), MONTH_VALUE_PARSER));
 			} catch (Exception e) {
 				throw new InvalidPatternException("invalid pattern \""
 						+ localPattern + "\". Error parsing months field: "
 						+ e.getMessage() + ".");
 			}
 			try {
-				dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(),
-						DAY_OF_WEEK_VALUE_PARSER));
+				dayOfWeekMatchers.add(buildValueMatcher(st2.nextToken(), DAY_OF_WEEK_VALUE_PARSER));
 			} catch (Exception e) {
 				throw new InvalidPatternException("invalid pattern \""
 						+ localPattern
@@ -332,7 +326,11 @@ public class SchedulingPattern {
 		if (values.size() == 0) {
 			throw new Exception("invalid field \"" + str + "\"");
 		}
-		return new IntArrayValueMatcher(values);
+		if (parser == DAY_OF_MONTH_VALUE_PARSER) {
+			return new DayOfMonthValueMatcher(values);
+		} else {
+			return new IntArrayValueMatcher(values);
+		}
 	}
 
 	/**
@@ -456,15 +454,16 @@ public class SchedulingPattern {
 		int dayOfMonth = gc.get(Calendar.DAY_OF_MONTH);
 		int month = gc.get(Calendar.MONTH) + 1;
 		int dayOfWeek = gc.get(Calendar.DAY_OF_WEEK) - 1;
+		int year = gc.get(Calendar.YEAR);
 		for (int i = 0; i < matcherSize; i++) {
 			ValueMatcher minuteMatcher = (ValueMatcher) minuteMatchers.get(i);
 			ValueMatcher hourMatcher = (ValueMatcher) hourMatchers.get(i);
-			ValueMatcher dayOfMonthMatcher = (ValueMatcher) dayOfMonthMatchers.get(i);
+			DayOfMonthValueMatcher dayOfMonthMatcher = (DayOfMonthValueMatcher) dayOfMonthMatchers.get(i);
 			ValueMatcher monthMatcher = (ValueMatcher) monthMatchers.get(i);
 			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers.get(i);
 			boolean eval = minuteMatcher.match(minute)
 					&& hourMatcher.match(hour)
-					&& dayOfMonthMatcher.match(dayOfMonth)
+					&& dayOfMonthMatcher.match(dayOfMonth, month, gc.isLeapYear(year))
 					&& monthMatcher.match(month)
 					&& dayOfWeekMatcher.match(dayOfWeek);
 			if (eval) {
@@ -636,6 +635,23 @@ public class SchedulingPattern {
 			super(1, 31);
 		}
 
+		/**
+		 * Added to support last-day-of-month.
+		 * 
+		 * @param value
+		 *            The value to be parsed
+		 * @return the integer day of the month or 32 for last day of the month
+		 * @throws Exception
+		 *             if the input value is invalid
+		 */
+		public int parse(String value) throws Exception {
+			if (value.equalsIgnoreCase("L")) {
+				return 32;
+			} else {
+				return super.parse(value);
+			}
+		}
+
 	}
 
 	/**
@@ -676,8 +692,7 @@ public class SchedulingPattern {
 		/**
 		 * Days of week aliases.
 		 */
-		private static String[] ALIASES = { "sun", "mon", "tue", "wed", "thu",
-				"fri", "sat" };
+		private static String[] ALIASES = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 
 		/**
 		 * Builds the months value parser.

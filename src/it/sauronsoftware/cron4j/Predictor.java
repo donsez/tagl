@@ -1,7 +1,7 @@
 /*
  * cron4j - A pure Java cron-like scheduler
  * 
- * Copyright (C) 2007-2009 Carlo Pelliccia (www.sauronsoftware.it)
+ * Copyright (C) 2007-2010 Carlo Pelliccia (www.sauronsoftware.it)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version
@@ -155,7 +155,7 @@ public class Predictor {
 		long[] times = new long[size];
 		for (int k = 0; k < size; k++) {
 			// Ok, split the time!
-			Calendar c = new GregorianCalendar();
+			GregorianCalendar c = new GregorianCalendar();
 			c.setTimeInMillis(time);
 			int minute = c.get(Calendar.MINUTE);
 			int hour = c.get(Calendar.HOUR_OF_DAY);
@@ -165,7 +165,7 @@ public class Predictor {
 			// Gets the matchers.
 			ValueMatcher minuteMatcher = (ValueMatcher) schedulingPattern.minuteMatchers.get(k);
 			ValueMatcher hourMatcher = (ValueMatcher) schedulingPattern.hourMatchers.get(k);
-			ValueMatcher dayOfMonthMatcher = (ValueMatcher) schedulingPattern.dayOfMonthMatchers.get(k);
+			DayOfMonthValueMatcher dayOfMonthMatcher = (DayOfMonthValueMatcher) schedulingPattern.dayOfMonthMatchers.get(k);
 			ValueMatcher dayOfWeekMatcher = (ValueMatcher) schedulingPattern.dayOfWeekMatchers.get(k);
 			ValueMatcher monthMatcher = (ValueMatcher) schedulingPattern.monthMatchers.get(k);
 			for (;;) { // day of week
@@ -198,17 +198,17 @@ public class Predictor {
 							dayOfMonth = 1;
 							month++;
 						}
-						if (dayOfMonthMatcher.match(dayOfMonth)) {
+						if (month > Calendar.DECEMBER) {
+							month = Calendar.JANUARY;
+							year++;
+						}
+						if (dayOfMonthMatcher.match(dayOfMonth, month + 1, c.isLeapYear(year))) {
 							break;
 						} else {
 							dayOfMonth++;
 							hour = 0;
 							minute = 0;
 						}
-					}
-					if (month > Calendar.DECEMBER) {
-						month = Calendar.JANUARY;
-						year++;
 					}
 					if (monthMatcher.match(month + 1)) {
 						break;

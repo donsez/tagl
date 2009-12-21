@@ -1,8 +1,8 @@
 /*
  * cron4j - A pure Java cron-like scheduler
- * 
+ *
  * Copyright (C) 2007-2010 Carlo Pelliccia (www.sauronsoftware.it)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version
  * 2.1, as published by the Free Software Foundation.
@@ -23,17 +23,15 @@ import java.util.ArrayList;
 /**
  * <p>
  * A ValueMatcher whose rules are in a plain array of integer values. When asked
- * to validate a value, this ValueMatcher checks if it is in the array.
+ * to validate a value, this ValueMatcher checks if it is in the array and, if
+ * not, checks whether the last-day-of-month setting applies.
  * </p>
  * 
- * @author Carlo Pelliccia
+ * @author Paul Fernley
  */
-class IntArrayValueMatcher implements ValueMatcher {
+class DayOfMonthValueMatcher extends IntArrayValueMatcher {
 
-	/**
-	 * The accepted values.
-	 */
-	private int[] values;
+	private static final int[] lastDays = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	/**
 	 * Builds the ValueMatcher.
@@ -41,30 +39,27 @@ class IntArrayValueMatcher implements ValueMatcher {
 	 * @param integers
 	 *            An ArrayList of Integer elements, one for every value accepted
 	 *            by the matcher. The match() method will return true only if
-	 *            its parameter will be one of this list.
+	 *            its parameter will be one of this list or the
+	 *            last-day-of-month setting applies.
 	 */
-	public IntArrayValueMatcher(ArrayList integers) {
-		int size = integers.size();
-		values = new int[size];
-		for (int i = 0; i < size; i++) {
-			try {
-				values[i] = ((Integer) integers.get(i)).intValue();
-			} catch (Exception e) {
-				throw new IllegalArgumentException(e.getMessage());
-			}
-		}
+	public DayOfMonthValueMatcher(ArrayList integers) {
+		super(integers);
 	}
 
 	/**
-	 * Returns true if the given value is included in the matcher list.
+	 * Returns true if the given value is included in the matcher list or the
+	 * last-day-of-month setting applies.
 	 */
-	public boolean match(int value) {
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] == value) {
-				return true;
-			}
+	public boolean match(int value, int month, boolean isLeapYear) {
+		return (super.match(value) || (value > 27 && match(32) && isLastDayOfMonth(value, month, isLeapYear)));
+	}
+
+	public boolean isLastDayOfMonth(int value, int month, boolean isLeapYear) {
+		if (isLeapYear && month == 2) {
+			return value == 29;
+		} else {
+			return value == lastDays[month - 1];
 		}
-		return false;
 	}
 
 }
