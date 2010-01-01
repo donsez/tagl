@@ -1,10 +1,10 @@
-RELEASE 2.2 - 2009-12-
+RELEASE 2.2 - 2010-01-01
 
 - The CronParser has been enhanced. Before this release a cron line
   could be used only to launch external process. Now it can be used
   also to invoke a static method within a class.
 
-- A new facility has been added to the scheduling pattern sintax.
+- A new facility has been added to the scheduling pattern syntax.
   The special value "L" can now be used to recognize the last day
   of month.
 
