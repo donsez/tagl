@@ -165,7 +165,7 @@ public class Predictor {
 			// Gets the matchers.
 			ValueMatcher minuteMatcher = (ValueMatcher) schedulingPattern.minuteMatchers.get(k);
 			ValueMatcher hourMatcher = (ValueMatcher) schedulingPattern.hourMatchers.get(k);
-			DayOfMonthValueMatcher dayOfMonthMatcher = (DayOfMonthValueMatcher) schedulingPattern.dayOfMonthMatchers.get(k);
+			ValueMatcher dayOfMonthMatcher = (ValueMatcher) schedulingPattern.dayOfMonthMatchers.get(k);
 			ValueMatcher dayOfWeekMatcher = (ValueMatcher) schedulingPattern.dayOfWeekMatchers.get(k);
 			ValueMatcher monthMatcher = (ValueMatcher) schedulingPattern.monthMatchers.get(k);
 			for (;;) { // day of week
@@ -202,7 +202,16 @@ public class Predictor {
 							month = Calendar.JANUARY;
 							year++;
 						}
-						if (dayOfMonthMatcher.match(dayOfMonth, month + 1, c.isLeapYear(year))) {
+						if (dayOfMonthMatcher instanceof DayOfMonthValueMatcher) {
+							DayOfMonthValueMatcher aux = (DayOfMonthValueMatcher) dayOfMonthMatcher;
+							if (aux.match(dayOfMonth, month + 1, c.isLeapYear(year))) {
+								break;
+							} else {
+								dayOfMonth++;
+								hour = 0;
+								minute = 0;
+							}
+						} else if (dayOfMonthMatcher.match(dayOfMonth)) {
 							break;
 						} else {
 							dayOfMonth++;

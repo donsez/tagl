@@ -1,3 +1,10 @@
+RELEASE 2.2.1 - 2010-01-04
+
+- Bugfix in the newly implemented "last day of month" feature.
+
+(Thanks to Stavros Michael)
+
+
 RELEASE 2.2 - 2010-01-01
 
 - The CronParser has been enhanced. Before this release a cron line
