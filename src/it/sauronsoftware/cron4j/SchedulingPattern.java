@@ -36,7 +36,7 @@ import java.util.TimeZone;
  * <li><strong>Hours sub-pattern</strong>. During which hours of the day should
  * the task been launched? The values range is from 0 to 23.</li>
  * <li><strong>Days of month sub-pattern</strong>. During which days of the
- * month should the task been launched? The values range is from 0 to 31. The
+ * month should the task been launched? The values range is from 1 to 31. The
  * special value L can be used to recognize the last day of month.</li>
  * <li><strong>Months sub-pattern</strong>. During which months of the year
  * should the task been launched? The values range is from 1 (January) to 12
