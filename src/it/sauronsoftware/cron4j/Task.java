@@ -159,8 +159,8 @@ public abstract class Task {
 
 	/**
 	 * <p>
-	 * This method is called to require a task execution, and should contains
-	 * the core routine of any scheduled task.
+	 * This method is called to require a task execution, and should contain the
+	 * core routine of any scheduled task.
 	 * </p>
 	 * 
 	 * <p>
