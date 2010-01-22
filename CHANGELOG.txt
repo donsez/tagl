@@ -2,7 +2,7 @@ RELEASE
 
 - Some errors in the manual and in the javadocs have been fixed.
 
-(Thanks to Ron Coleman)
+(Thanks to Ron Coleman, Assaf Moldavsky)
 
 
 RELEASE 2.2.1 - 2010-01-04
