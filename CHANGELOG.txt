@@ -1,8 +1,9 @@
-RELEASE
+RELEASE 2.2.2 - 2010-03-09
 
+- A bug in the scheduling pattern parser has been fixed.
 - Some errors in the manual and in the javadocs have been fixed.
 
-(Thanks to Ron Coleman, Assaf Moldavsky)
+(Thanks to Bart Lamberigts, Ron Coleman, Assaf Moldavsky)
 
 
 RELEASE 2.2.1 - 2010-01-04

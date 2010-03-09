@@ -392,10 +392,11 @@ public class SchedulingPattern {
 	private ArrayList parseRange(String str, ValueParser parser)
 			throws Exception {
 		if (str.equals("*")) {
-			int[] all = parser.getAllPossibleValues();
+			int min = parser.getMinValue();
+			int max = parser.getMaxValue();
 			ArrayList values = new ArrayList();
-			for (int i = 0; i < all.length; i++) {
-				values.add(new Integer(all[i]));
+			for (int i = min; i <= max; i++) {
+				values.add(new Integer(i));
 			}
 			return values;
 		}
@@ -425,11 +426,23 @@ public class SchedulingPattern {
 				throw new Exception("invalid value \"" + v2Str + "\", "
 						+ e.getMessage());
 			}
-			int s1 = Math.min(v1, v2);
-			int s2 = Math.max(v1, v2);
 			ArrayList values = new ArrayList();
-			for (int i = s1; i <= s2; i++) {
-				values.add(new Integer(i));
+			if (v1 < v2) {
+				for (int i = v1; i <= v2; i++) {
+					values.add(new Integer(i));
+				}
+			} else if (v1 > v2) {
+				int min = parser.getMinValue();
+				int max = parser.getMaxValue();
+				for (int i = v1; i <= max; i++) {
+					values.add(new Integer(i));
+				}
+				for (int i = min; i <= v2; i++) {
+					values.add(new Integer(i));
+				}
+			} else {
+				// v1 == v2
+				values.add(new Integer(v1));
 			}
 			return values;
 		}
@@ -463,7 +476,9 @@ public class SchedulingPattern {
 			ValueMatcher dayOfWeekMatcher = (ValueMatcher) dayOfWeekMatchers.get(i);
 			boolean eval = minuteMatcher.match(minute)
 					&& hourMatcher.match(hour)
-					&& ((dayOfMonthMatcher instanceof DayOfMonthValueMatcher) ? ((DayOfMonthValueMatcher) dayOfMonthMatcher).match(dayOfMonth, month, gc.isLeapYear(year)) : dayOfMonthMatcher.match(dayOfMonth)) 
+					&& ((dayOfMonthMatcher instanceof DayOfMonthValueMatcher) ? ((DayOfMonthValueMatcher) dayOfMonthMatcher)
+							.match(dayOfMonth, month, gc.isLeapYear(year))
+							: dayOfMonthMatcher.match(dayOfMonth))
 					&& monthMatcher.match(month)
 					&& dayOfWeekMatcher.match(dayOfWeek);
 			if (eval) {
@@ -535,11 +550,18 @@ public class SchedulingPattern {
 		public int parse(String value) throws Exception;
 
 		/**
-		 * Returns a list of all the values allowed.
+		 * Returns the minimum value accepred by the parser.
 		 * 
-		 * @return A list of all the values allowed.
+		 * @return The minimum value accepred by the parser.
 		 */
-		public int[] getAllPossibleValues();
+		public int getMinValue();
+
+		/**
+		 * Returns the maximum value accepred by the parser.
+		 * 
+		 * @return The maximum value accepred by the parser.
+		 */
+		public int getMaxValue();
 
 	}
 
@@ -584,13 +606,12 @@ public class SchedulingPattern {
 			return i;
 		}
 
-		public int[] getAllPossibleValues() {
-			int size = maxValue - minValue + 1;
-			int[] ret = new int[size];
-			for (int i = 0; i < size; i++) {
-				ret[i] = minValue + i;
-			}
-			return ret;
+		public int getMinValue() {
+			return minValue;
+		}
+
+		public int getMaxValue() {
+			return maxValue;
 		}
 
 	}
