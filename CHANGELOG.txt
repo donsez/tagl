@@ -1,3 +1,12 @@
+NEXT RELEASE
+
+- A bug has been fixed in the ProcessTask class, avoiding
+  the "too many open files" problem encountered on some
+  systems.
+  
+(Thanks to Ivan Yiu)
+
+
 RELEASE 2.2.2 - 2010-03-09
 
 - A bug in the scheduling pattern parser has been fixed.

@@ -295,6 +295,24 @@ public class ProcessTask extends Task {
 			p.destroy();
 			throw new RuntimeException(toString() + " has been interrupted");
 		}
+		if (in != null) {
+			try {
+				in.close();
+			} catch (Throwable e) {
+			}
+		}
+		if (out != null) {
+			try {
+				out.close();
+			} catch (Throwable e) {
+			}
+		}
+		if (err != null) {
+			try {
+				err.close();
+			} catch (Throwable e) {
+			}
+		}
 		if (r != 0) {
 			throw new RuntimeException(toString() + " returns with error code "
 					+ r);
