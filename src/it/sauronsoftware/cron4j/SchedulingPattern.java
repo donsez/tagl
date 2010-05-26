@@ -639,7 +639,7 @@ public class SchedulingPattern {
 		 * Builds the value parser.
 		 */
 		public HourValueParser() {
-			super(0, 59);
+			super(0, 23);
 		}
 
 	}

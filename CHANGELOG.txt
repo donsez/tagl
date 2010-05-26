@@ -1,10 +1,13 @@
-NEXT RELEASE
+RELEASE 2.2.3 - 2010-05-26
 
 - A bug has been fixed in the ProcessTask class, avoiding
   the "too many open files" problem encountered on some
   systems.
+- A bug has been fixed in the SchedulingPattern class,
+  avoiding the possibility to use a value greater than
+  23 in the hour field of a scheduling pattern.
   
-(Thanks to Ivan Yiu)
+(Thanks to Ivan Yiu and John Mikula)
 
 
 RELEASE 2.2.2 - 2010-03-09
