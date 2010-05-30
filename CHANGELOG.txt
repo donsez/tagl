@@ -1,4 +1,4 @@
-RELEASE 2.2.3 - 2010-05-26
+RELEASE 2.2.3 - 2010-05-30
 
 - A bug has been fixed in the ProcessTask class, avoiding
   the "too many open files" problem encountered on some
