@@ -1,3 +1,10 @@
+RELEASE 2.2.4 -
+
+- A bug has been fixed in the ProcessTask class.
+
+(Thanks to Ivan Yiu)
+
+
 RELEASE 2.2.3 - 2010-05-30
 
 - A bug has been fixed in the ProcessTask class, avoiding

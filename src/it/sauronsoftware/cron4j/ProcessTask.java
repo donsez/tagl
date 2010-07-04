@@ -292,30 +292,30 @@ public class ProcessTask extends Task {
 		try {
 			r = p.waitFor();
 		} catch (InterruptedException e) {
-			p.destroy();
 			throw new RuntimeException(toString() + " has been interrupted");
-		}
-		if (in != null) {
-			try {
-				in.close();
-			} catch (Throwable e) {
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Throwable e) {
+				}
 			}
-		}
-		if (out != null) {
-			try {
-				out.close();
-			} catch (Throwable e) {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Throwable e) {
+				}
 			}
-		}
-		if (err != null) {
-			try {
-				err.close();
-			} catch (Throwable e) {
+			if (err != null) {
+				try {
+					err.close();
+				} catch (Throwable e) {
+				}
 			}
+			p.destroy();
 		}
 		if (r != 0) {
-			throw new RuntimeException(toString() + " returns with error code "
-					+ r);
+			throw new RuntimeException(toString() + " returns with error code " + r);
 		}
 	}
 
