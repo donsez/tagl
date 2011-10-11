@@ -1,3 +1,11 @@
+RELEASE 2.2.5 - TBD
+
+- A bug causing a rare deadlock condition while shutting down
+  the scheduler has been fixed.
+
+(Tanks to Eugene Yao)
+
+
 RELEASE 2.2.4 - 2011-08-26
 
 - A bug has been fixed in the ProcessTask class.

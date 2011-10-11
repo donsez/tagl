@@ -143,9 +143,7 @@ public class Scheduler {
 	 *            The time zone applied by the scheduler.
 	 */
 	public void setTimeZone(TimeZone timezone) {
-		synchronized (lock) {
-			this.timezone = timezone;
-		}
+		this.timezone = timezone;
 	}
 
 	/**
@@ -154,9 +152,7 @@ public class Scheduler {
 	 * @return The time zone applied by the scheduler.
 	 */
 	public TimeZone getTimeZone() {
-		synchronized (lock) {
-			return timezone != null ? timezone : TimeZone.getDefault();
-		}
+		return timezone != null ? timezone : TimeZone.getDefault();
 	}
 
 	/**
@@ -165,9 +161,7 @@ public class Scheduler {
 	 * @return true if this scheduler is a daemon scheduler; false otherwise.
 	 */
 	public boolean isDaemon() {
-		synchronized (lock) {
-			return daemon;
-		}
+		return daemon;
 	}
 
 	/**
@@ -438,7 +432,7 @@ public class Scheduler {
 	 */
 	public void reschedule(String id, String schedulingPattern)
 			throws InvalidPatternException {
-		reschedule((String) id, new SchedulingPattern(schedulingPattern));
+		reschedule(id, new SchedulingPattern(schedulingPattern));
 	}
 
 	/**

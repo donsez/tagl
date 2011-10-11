@@ -240,8 +240,7 @@ public class TaskExecutor {
 	void start(boolean daemon) {
 		synchronized (lock) {
 			startTime = System.currentTimeMillis();
-			String name = "cron4j::scheduler[" + scheduler.getGuid()
-					+ "]::executor[" + guid + "]";
+			String name = "cron4j::scheduler[" + scheduler.getGuid() + "]::executor[" + guid + "]";
 			thread = new Thread(new Runner());
 			thread.setDaemon(daemon);
 			thread.setName(name);

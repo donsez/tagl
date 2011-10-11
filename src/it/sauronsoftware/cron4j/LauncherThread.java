@@ -91,8 +91,7 @@ class LauncherThread extends Thread {
 					break outer;
 				}
 				SchedulingPattern pattern = taskTable.getSchedulingPattern(j);
-				if (pattern.match(scheduler.getTimeZone(),
-						referenceTimeInMillis)) {
+				if (pattern.match(scheduler.getTimeZone(), referenceTimeInMillis)) {
 					Task task = taskTable.getTask(j);
 					scheduler.spawnExecutor(task);
 				}
