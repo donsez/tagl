@@ -21,6 +21,7 @@ package it.sauronsoftware.cron4j;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * <p>
@@ -54,6 +55,11 @@ public class Predictor {
 	 * The start time for the next prediction.
 	 */
 	private long time;
+
+	/**
+	 * The time zone for the prediction.
+	 */
+	private TimeZone timeZone = TimeZone.getDefault();
 
 	/**
 	 * It builds a predictor with the given scheduling pattern and start time.
@@ -139,6 +145,17 @@ public class Predictor {
 	}
 
 	/**
+	 * Sets the time zone for predictions.
+	 * 
+	 * @param timeZone
+	 *            The time zone for predictions.
+	 * @since 2.2.5
+	 */
+	public void setTimeZone(TimeZone timeZone) {
+		this.timeZone = timeZone;
+	}
+
+	/**
 	 * It returns the next matching moment as a millis value.
 	 * 
 	 * @return The next matching moment as a millis value.
@@ -157,6 +174,7 @@ public class Predictor {
 			// Ok, split the time!
 			GregorianCalendar c = new GregorianCalendar();
 			c.setTimeInMillis(time);
+			c.setTimeZone(timeZone);
 			int minute = c.get(Calendar.MINUTE);
 			int hour = c.get(Calendar.HOUR_OF_DAY);
 			int dayOfMonth = c.get(Calendar.DAY_OF_MONTH);
@@ -183,7 +201,7 @@ public class Predictor {
 									}
 								}
 							}
-							if (hour > 23)  {
+							if (hour > 23) {
 								hour = 0;
 								dayOfMonth++;
 							}
@@ -230,6 +248,7 @@ public class Predictor {
 				}
 				// Is this ok?
 				c = new GregorianCalendar();
+				c.setTimeZone(timeZone);
 				c.set(Calendar.MINUTE, minute);
 				c.set(Calendar.HOUR_OF_DAY, hour);
 				c.set(Calendar.DAY_OF_MONTH, dayOfMonth);

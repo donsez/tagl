@@ -1,9 +1,10 @@
 RELEASE 2.2.5 - TBD
 
+- setTimeZone() method has been add to the Predictor class.
 - A bug causing a rare deadlock condition while shutting down
   the scheduler has been fixed.
 
-(Tanks to Eugene Yao)
+(Tanks to Tim McCune and Eugene Yao)
 
 
 RELEASE 2.2.4 - 2011-08-26
