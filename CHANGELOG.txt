@@ -1,4 +1,4 @@
-RELEASE 2.2.5 - TBD
+RELEASE 2.2.5 - 2011-12-28
 
 - setTimeZone() method has been add to the Predictor class.
 - A bug causing a rare deadlock condition while shutting down
