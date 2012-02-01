@@ -82,6 +82,10 @@ class TimerThread extends Thread {
 			long before = System.currentTimeMillis();
 			sleep(millis - done);
 			long after = System.currentTimeMillis();
+			if (before > after) {
+				// Clock time has changed during sleep!
+				return;
+			}
 			done += (after - before);
 		} while (done < millis);
 	}
